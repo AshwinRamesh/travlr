@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/travlr/static/css/main.79f4ebbd.css",
+    "main.js": "/travlr/static/js/main.b7bf5be0.js",
+    "static/js/453.31836662.chunk.js": "/travlr/static/js/453.31836662.chunk.js",
+    "index.html": "/travlr/index.html",
+    "main.79f4ebbd.css.map": "/travlr/static/css/main.79f4ebbd.css.map",
+    "main.b7bf5be0.js.map": "/travlr/static/js/main.b7bf5be0.js.map",
+    "453.31836662.chunk.js.map": "/travlr/static/js/453.31836662.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.79f4ebbd.css",
+    "static/js/main.b7bf5be0.js"
+  ]
+}
