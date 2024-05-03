@@ -42,7 +42,7 @@ const CalendarPicker = () => {
 
 function Navbar() {
   return (
-    <nav className="bg-slate-500 py-4 px-8 flex items-center justify-between">
+    <nav className="bg-glade-green-500 py-4 px-8 flex items-center justify-between">
       <div className="text-white font-bold text-lg">Travlr 🛫</div>
       <ul className="flex space-x-4">
         {/* <li><a href="#" className="text-white hover:text-gray-200">Home</a></li>
@@ -58,7 +58,7 @@ const AccomodationComponent = (props) => {
   const { accomodation } = props;
   if (accomodation) {
     return (
-      <div class="basis-1/4 rounded bg-emerald-100 mx-2 px-2 min-h-32 max-h-32">
+      <div class="basis-1/4 rounded bg-glade-green-100 mx-2 px-2 min-h-32 max-h-32">
         <h2 className='text-lg font-semibold'>🏚️ Accomodation</h2>
         <p className="text-left">Name - {accomodation.name}</p>
         <p className='text-left'>Address - {accomodation.address}</p>
@@ -66,7 +66,7 @@ const AccomodationComponent = (props) => {
     );
   }
   return (
-    <div class="basis-1/4 rounded bg-lime-200 mx-2 px-2 min-h-32 max-h-32">
+    <div class="basis-1/4 rounded bg-glade-green-200 mx-2 px-2 min-h-32 max-h-32">
       <h2 className='text-lg font-semibold'>🏚️ Accomodation</h2>
       <p>No accomodation booked!</p>
     </div>
@@ -96,7 +96,7 @@ const DayItineraryComponent = (props) => {
 
   return (
     <div className='bg-gray-200 rounded-lg shadow-lg pb-2 mb-10'>
-      <div className='h-20 bg-gray-700 flex items-center justify-center rounded-t-lg my-3'>
+      <div className='h-20 bg-glade-green-700 flex items-center justify-center rounded-t-lg my-3'>
         <h2 class="text-white text-2xl font-bold">{formatDateToHumanReadable(dayItinerary.date)}{dayItinerary.accomodation && " - " + dayItinerary.accomodation.city}</h2>
       </div>
       
@@ -107,7 +107,7 @@ const DayItineraryComponent = (props) => {
           {dayItinerary.activities.map(a => {
             return (
               <div class="bg-white rounded-lg shadow-lg flex mb-2">              
-                <div class="w-1/4  bg-slate-800 flex items-center justify-center">
+                <div class="w-1/4  bg-glade-green-800 flex items-center justify-center">
                   <p className='text-xl text-white text-center'>{a.activityType}</p>
                 </div>
                 
@@ -134,7 +134,7 @@ const MainSection = (props) => {
   console.log("Itinerary", itineraryReal);
 
   return (
-    <div className="container mx-auto py-8 px-4 flex">
+    <div className="container mx-auto py-8 px-4 flex h-screen">
       <div className="w-1/4">
         {/* Left column - menu options */}
         <div className="bg-white shadow-md p-4 rounded">
@@ -142,7 +142,7 @@ const MainSection = (props) => {
           <CalendarPicker />
         </div>
       </div>
-      <div className="w-3/4 ml-4">
+      <div className="w-3/4 ml-4 overflow-y-auto">
         {/* Right column - informational component */}
         <div className="bg-white shadow-md p-4 rounded">
           {Object.entries(itineraryReal.dayItineraries).map(([key, val]) => <DayItineraryComponent dayItinerary={val}/>)}
