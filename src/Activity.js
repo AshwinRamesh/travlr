@@ -25,13 +25,14 @@ function enumerateDates(startDateStr, endDateStr) {
 
 
 export class Activity {
-    constructor(name, date, activityType, address) {
+    constructor(name, date, activityType, address, details) {
         this.name = name;
         this.date = date; // TODO - have a method to make this human readable.
         this.activityType = activityType; // TODO - need to validate later.
         this.address = address;
         this.city = null;
         this.country = null;
+        this.details = details;
         // TODO - other props
     }
 }
@@ -88,8 +89,8 @@ export class TripItinerary {
         }
 
         // Add check-in & checkout
-        const checkInActivity = new Activity("Check-in: " + name, checkInDate, "Check-In", address);
-        const checkOutActivity = new Activity("Check-out: " + name, checkOutDate, "Check-Out", address);
+        const checkInActivity = new Activity("Check-in: " + name, checkInDate, "Check-In", address, null);
+        const checkOutActivity = new Activity("Check-out: " + name, checkOutDate, "Check-Out", address, null);
         this.addactivity(checkInActivity);
         this.addactivity(checkOutActivity);
 
@@ -115,7 +116,8 @@ export class TripItinerary {
         const activityCity = rawData["City"];
         const activityCountry = rawData["Country"];
         const activityName = rawData["Activity Name"];
-        const activityDetail = rawData["Activity Detail"];
+        const activityDetail = rawData["Activity Details"];
+        console.log("Activity Detail", activityDetail);
 
         // Skip all activities that are accomodation related
         const accomTypeStrList = ["🏠 Accomodation", "Check In", "Check Out"];
@@ -136,7 +138,7 @@ export class TripItinerary {
         }
 
         // Add activity
-        const a = new Activity(activityName, activityDate, activityType, "");
+        const a = new Activity(activityName, activityDate, activityType, "", activityDetail);
         this.addactivity(a);
     }
 

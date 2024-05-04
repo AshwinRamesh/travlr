@@ -75,12 +75,42 @@ const AccomodationComponent = (props) => {
 }
 
 const ActivityComponent = (props) => {
-  const { activity } = props;
+  const [activity, setActivity] = useState(props.activity);
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  
+
+  const toggleCollapse = () => {
+    console.log("Trigger collapse", isCollapsed);
+    setIsCollapsed(!isCollapsed);
+  };
 
   return (
-    <li>{activity.activityType} - {activity.name}</li>
-  );
-}
+    <div class="bg-white rounded-lg shadow-lg flex mb-2">              
+      <div class="w-1/4  bg-glade-green-800 flex items-center justify-center">
+        <p className='text-xl text-white text-center'>{activity.activityType}</p>
+      </div>
+      
+      <div class="w-3/4 p-4">
+        
+        <div onClick={toggleCollapse}>
+          <span class="text-l font-bold mb-2">{activity.name}</span>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className={`h-4 w-4 transform transition-transform duration-300 ${isCollapsed ? 'rotate-180' : ''}`}>
+            <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414zM10 18a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
+          </svg>
+        </div>
+        
+        <div className={`overflow-hidden transition-max-height duration-300 ${isCollapsed ? 'max-h-screen' : 'max-h-0'}`}>
+          <div className="px-4 py-2">
+            <p class="text-gray-700">Address - {activity.address}</p>
+            <p class="text-gray-700">Notes - {activity.details}</p>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+  )
+};
+
 
 const DayItineraryComponent = (props) => {
   const { dayItinerary } = props;
@@ -104,22 +134,7 @@ const DayItineraryComponent = (props) => {
         <div className="basis-3/4 rounded px-3 bg-neutral-100 ml-2">
           <h2 className='text-xl font-semibold back mb-3'>📚 Itinerary</h2>
           {dayItinerary.activities.length == 0 && <p>No activities planned!</p>}
-          {dayItinerary.activities.map(a => {
-            return (
-              <div class="bg-white rounded-lg shadow-lg flex mb-2">              
-                <div class="w-1/4  bg-glade-green-800 flex items-center justify-center">
-                  <p className='text-xl text-white text-center'>{a.activityType}</p>
-                </div>
-                
-                <div class="w-3/4 p-4">
-                  <h2 class="text-l font-bold mb-2">{a.name}</h2>
-                  <p class="text-gray-700"></p>
-                </div>
-              </div>
-            )
-          
-          
-          })}
+          {dayItinerary.activities.map(a => { return <ActivityComponent activity={a}/> })}
         </div>
         <AccomodationComponent accomodation={dayItinerary.accomodation} />
       </div>
