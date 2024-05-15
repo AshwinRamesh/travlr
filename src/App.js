@@ -27,6 +27,11 @@ function formatDateToHumanReadable(dateString) {
   return `${monthName} ${parseInt(day, 10)}${daySuffix}, ${year}`;
 }
 
+function generateMapUrl(query) {
+  const prefix = "https://www.google.com/maps/search/?api=1&query=";
+  return prefix + encodeURIComponent(query);
+}
+
 // CSS Modules, react-datepicker-cssmodules.css
 // import 'react-datepicker/dist/react-datepicker-cssmodules.css';
 
@@ -57,8 +62,10 @@ const AccomodationComponent = (props) => {
     return (
       <div class="rounded bg-glade-green-100 mx-2 px-2 w-full">
         <h2 className='text-lg font-semibold'>🏚️ Accomodation</h2>
-        <p className="text-left">Name - {accomodation.name}</p>
-        <p className='text-left'>Address - {accomodation.address}</p>
+        <p className="text-left font-semibold">Name - {accomodation.name}</p>
+        <p className='text-left font-semibold'>Address - 
+          <a className="text-blue-800 font-normal" href={generateMapUrl(accomodation.address)} id="mapLink"> {accomodation.address}</a>
+        </p>
       </div>
     );
   }
