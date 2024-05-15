@@ -35,6 +35,60 @@ export class Activity {
         this.details = details;
         // TODO - other props
     }
+
+    mapType() {
+        switch (this.activityType) {
+            case "Accomodation":
+                return {
+                    'emoji': "🏠",
+                    'altText': "Accomodation",
+                    'color': 'bg-pink-800'
+                };
+            case "Food":
+                return {
+                    'emoji': "🍔",
+                    'altText': 'Food',
+                    'color': 'bg-blue-800'
+                };
+            case "Flight":
+                return {
+                    'emoji': "🛫",
+                    'altText': 'Flight',
+                    'color': 'bg-red-800'
+                };
+            case "Check-In":
+                return {
+                    'emoji': "➡️🏠",
+                    'altText': 'Check-In',
+                    'color': 'bg-pink-800'
+
+                };
+            case "Check-Out":
+                return {
+                    'emoji': "🏠➡️",
+                    'altText': 'Check-Out',
+                    'color': 'bg-pink-800'
+                };
+            default:
+                return {
+                    'emoji': "⁉️",
+                    'altText': this.activityType,
+                    'color': 'bg-pink-800'
+                }
+                
+
+        }
+        if (this.activityType == 'Accomodation') {
+            return {
+                'emoji': "🏠",
+                'altText': "Accomodation"
+            };
+        }
+        
+        else {
+            
+        }
+    }
 }
 
 // TODO - add check-in, check-out
