@@ -120,7 +120,7 @@ const DayItineraryComponent = (props) => {
       
       <div className="flex flex-row flex-wrap w-full">
         <div className="rounded px-3 bg-neutral-100 m-2 w-full">
-          <h2 className='text-l font-semibold back mb-3'>📚 Itinerary</h2>
+          <h2 className='text-lg font-semibold mb-3'>📚 Itinerary</h2>
           {dayItinerary.activities.length == 0 && <p>No activities planned!</p>}
           {dayItinerary.activities.map(a => { return <ActivityComponent activity={a}/> })}
         </div>
