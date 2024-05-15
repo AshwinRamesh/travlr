@@ -42,16 +42,12 @@ const CalendarPicker = () => {
 
 function Navbar() {
   return (
-    <nav className="bg-glade-green-500 py-4 px-8 flex items-center justify-between">
-      <div className="text-white font-bold text-lg">Travlr 🛫</div>
-      <ul className="flex space-x-4">
-        <li><CalendarPicker /></li>
-        {/* <li><a href="#" className="text-white hover:text-gray-200">Home</a></li>
-    <li><a href="#" className="text-white hover:text-gray-200">About</a></li>
-  <li><a href="#" className="text-white hover:text-gray-200">Contact</a></li> */}
-        {/* Add more menu items as needed */}
-      </ul>
-    </nav>
+<nav className="bg-glade-green-500 py-4 px-8 flex items-center justify-between fixed w-full top-0 z-10">
+  <div className="text-white font-bold text-lg">Travlr 🛫</div>
+  <ul className="flex space-x-4">
+    <li><CalendarPicker /></li>
+  </ul>
+</nav>
   );
 }
 
