@@ -1,27 +1,4 @@
-function formatDate(date) {
-    // Get month, day, and year from the Date object
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // Month is zero-indexed
-    const day = String(date.getDate()).padStart(2, '0');
-    const year = date.getFullYear();
-  
-    // Concatenate the parts into the desired format "MM-DD-YYYY"
-    return `${month}-${day}-${year}`;
-}
-
-function enumerateDates(startDateStr, endDateStr) {
-    const startDate = new Date(startDateStr);
-    const endDate = new Date(endDateStr);
-    const dates = [];
-  
-    // Iterate through dates starting from startDate to endDate
-    for (let date = new Date(startDate); date <= endDate; date.setDate(date.getDate() + 1)) {
-      // Push the formatted date string to the dates array
-      const d = new Date(date);
-      dates.push(formatDate(d));
-    }
-  
-    return dates;
-}
+import { formatDate,  enumerateDates} from "./helpers/dateHelpers";
 
 
 export class Activity {
@@ -77,16 +54,6 @@ export class Activity {
                 }
                 
 
-        }
-        if (this.activityType == 'Accomodation') {
-            return {
-                'emoji': "🏠",
-                'altText': "Accomodation"
-            };
-        }
-        
-        else {
-            
         }
     }
 }

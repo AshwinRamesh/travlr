@@ -3,47 +3,42 @@ import React, { useState, useEffect } from 'react';
 import DatePicker from "react-datepicker";
 import { Activity, Accomodation, TripItinerary } from "./Activity.js";
 import { downloadAndParseCSV } from './helpers/downloadGSheet.js';
-
+import { formatDateToHumanReadable } from './helpers/dateHelpers.js';
 import "react-datepicker/dist/react-datepicker.css";
 
-
-function formatDateToHumanReadable(dateString) {
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-
-  const [month, day, year] = dateString.split('-');
-  const monthName = months[parseInt(month, 10) - 1];
-
-  let daySuffix;
-  if (day === '1' || day === '21' || day === '31') {
-    daySuffix = 'st';
-  } else if (day === '2' || day === '22') {
-    daySuffix = 'nd';
-  } else if (day === '3' || day === '23') {
-    daySuffix = 'rd';
-  } else {
-    daySuffix = 'th';
-  }
-
-  return `${monthName} ${parseInt(day, 10)}${daySuffix}, ${year}`;
-}
 
 function generateMapUrl(query) {
   const prefix = "https://www.google.com/maps/search/?api=1&query=";
   return prefix + encodeURIComponent(query);
 }
 
-// CSS Modules, react-datepicker-cssmodules.css
-// import 'react-datepicker/dist/react-datepicker-cssmodules.css';
-
 const CalendarPicker = () => {
   const [startDate, setStartDate] = useState(new Date());
-  return (
-    <div >
-      <DatePicker showIcon className='rounded border-solid border-2 px-2 border-slate-600' selected={startDate} onChange={(date) => setStartDate(date)} />
-    </div>
 
+  const handleDateChange = (date) => {
+    setStartDate(date);
+    // Scroll to the element with the same ID as the selected date
+    const formattedDate = date.toISOString().split('T')[0];
+    const idName = "dic-" + formattedDate;
+    const element = document.getElementById(idName);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+    console.log(date);
+  };
+
+  return (
+    <div>
+      <DatePicker
+        showIcon
+        className='rounded border-solid border-2 px-2 border-slate-600'
+        selected={startDate}
+        onChange={handleDateChange}
+      />
+    </div>
   );
 };
+
 
 function Navbar() {
   return (
@@ -118,9 +113,10 @@ const ActivityComponent = (props) => {
 
 const DayItineraryComponent = (props) => {
   const { dayItinerary } = props;
+  const idName = "dic-" + dayItinerary.date;
 
   return (
-    <div className='bg-gray-200 rounded-lg shadow-lg pb-2 mb-10'>
+    <div id={idName} className='bg-gray-200 rounded-lg shadow-lg pb-2 mb-10'>
       <div className='h-20 bg-glade-green-700 flex items-center justify-center rounded-t-lg my-3'>
         <h2 class="text-white text-xl font-bold">{formatDateToHumanReadable(dayItinerary.date)}{dayItinerary.accomodation && " - " + dayItinerary.accomodation.city}</h2>
       </div>
