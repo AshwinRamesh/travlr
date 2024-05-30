@@ -1,0 +1,9 @@
+- Fix accomodation issues
+    - Move check-in and check-out to start of each day
+- UX
+    - Fix padding at top, might need a little bit more
+    - Add colors to each activity and logo
+- Logic
+    - On page load, go to current day
+    - Date selector mapping
+- Add photo link feature.

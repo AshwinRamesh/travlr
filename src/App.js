@@ -137,8 +137,6 @@ const DayItineraryComponent = (props) => {
 const MainSection = (props) => {
   const itineraryReal = props.itinerary;
 
-  console.log("Itinerary", itineraryReal);
-
   return (
     <div className="mx-auto py-8 px-4 h-screen">
       <div className="overflow-y-auto">
