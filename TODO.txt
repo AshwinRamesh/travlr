@@ -7,3 +7,13 @@
     - On page load, go to current day
     - Date selector mapping
 - Add photo link feature.
+
+# V2
+
+- Costs
+    - Calculate cost per day
+    - Graphs?
+
+- Backend driven
+    - ???
+    - AI extraction of itinerary. 

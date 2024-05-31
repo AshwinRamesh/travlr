@@ -159,9 +159,16 @@ function App() {
   // State to track error state
   const [error, setError] = useState(null);
 
-  const csvUrlForItinerary = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQpIX5s37vCVwqZhGynq7fjc-VIUKCYCGlgjdOa03sTXFB3Jdq6B6gcyzA5mWTrAvx6gaerK8Umws_Y/pub?gid=1411334035&single=true&output=csv';
-  const csvUrlForAccomodation = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQpIX5s37vCVwqZhGynq7fjc-VIUKCYCGlgjdOa03sTXFB3Jdq6B6gcyzA5mWTrAvx6gaerK8Umws_Y/pub?gid=727628574&single=true&output=csv';  
-
+  var csvUrlForItinerary = "";
+  var csvUrlForAccomodation = "";
+  if (process.env.REACT_APP_ENV == "dev") {
+    csvUrlForItinerary = '/travlr/dev_data/itinerary.csv';
+    csvUrlForAccomodation = '/travlr/dev_data/accomodation.csv';
+  } else {
+    csvUrlForItinerary = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQpIX5s37vCVwqZhGynq7fjc-VIUKCYCGlgjdOa03sTXFB3Jdq6B6gcyzA5mWTrAvx6gaerK8Umws_Y/pub?gid=1411334035&single=true&output=csv';
+    csvUrlForAccomodation = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQpIX5s37vCVwqZhGynq7fjc-VIUKCYCGlgjdOa03sTXFB3Jdq6B6gcyzA5mWTrAvx6gaerK8Umws_Y/pub?gid=727628574&single=true&output=csv';    
+  }
+  
   useEffect(() => {
     var itinerary = new TripItinerary();
     const activitiesCsvPromise = downloadAndParseCSV(csvUrlForItinerary);
@@ -186,6 +193,8 @@ function App() {
 
       });
   }, []);
+
+  console.log(process.env.REACT_APP_ENV);
 
   return (
     <div className="App container bg-gray-100 min-h-screen max-w-lg">
