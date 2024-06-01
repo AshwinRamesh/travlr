@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import DatePicker from "react-datepicker";
 import { Activity, Accomodation, TripItinerary } from "./Activity.js";
 import { downloadAndParseCSV } from './helpers/downloadGSheet.js';
-import { formatDateToHumanReadable } from './helpers/dateHelpers.js';
+import { formatDateForId, formatDateToHumanReadable, formatStringToDate } from './helpers/dateHelpers.js';
 import "react-datepicker/dist/react-datepicker.css";
 
 
@@ -12,17 +12,20 @@ function generateMapUrl(query) {
   return prefix + encodeURIComponent(query);
 }
 
-const CalendarPicker = () => {
+const CalendarPicker = (props) => {
   const [startDate, setStartDate] = useState(new Date());
+  const selectedDate = props.selectedDate;
+  const setSelectedDate = props.setSelectedDate;
 
   const handleDateChange = (date) => {
-    setStartDate(date);
+    setSelectedDate(date);
     // Scroll to the element with the same ID as the selected date
-    const formattedDate = date.toISOString().split('T')[0];
-    const idName = "dic-" + formattedDate;
+    const idName = formatDateForId(date);
     const element = document.getElementById(idName);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      console.log("Cannot find element" + idName);
     }
     console.log(date);
   };
@@ -32,7 +35,7 @@ const CalendarPicker = () => {
       <DatePicker
         showIcon
         className='rounded border-solid border-2 px-2 border-slate-600'
-        selected={startDate}
+        selected={selectedDate}
         onChange={handleDateChange}
       />
     </div>
@@ -40,14 +43,14 @@ const CalendarPicker = () => {
 };
 
 
-function Navbar() {
+const Navbar = (props) => {
   return (
-<nav className="bg-glade-green-500 py-4 px-8 flex items-center justify-between fixed w-full top-0 z-10">
-  <div className="text-white font-bold text-lg">Travlr 🛫</div>
-  <ul className="flex space-x-4">
-    <li><CalendarPicker /></li>
-  </ul>
-</nav>
+    <nav className="bg-glade-green-500 py-4 px-8 flex items-center justify-between fixed w-full top-0 z-10">
+      <div className="text-white font-bold text-lg">Travlr 🛫</div>
+      <ul className="flex space-x-4">
+        <li><CalendarPicker selectedDate={props.selectedDate} setSelectedDate={props.setSelectedDate}/></li>
+      </ul>
+    </nav>
   );
 }
 
@@ -113,7 +116,8 @@ const ActivityComponent = (props) => {
 
 const DayItineraryComponent = (props) => {
   const { dayItinerary } = props;
-  const idName = "dic-" + dayItinerary.date;
+  const date = formatStringToDate(dayItinerary.date)
+  const idName = formatDateForId(date);
 
   return (
     <div id={idName} className='bg-gray-200 rounded-lg shadow-lg pb-2 mb-10'>
@@ -136,16 +140,18 @@ const DayItineraryComponent = (props) => {
 
 const MainSection = (props) => {
   const itineraryReal = props.itinerary;
+  const selectedDate = props.selectedDate;
+  const setSelectedDate = props.setSelectedDate;
 
   return (
-    <div className="mx-auto py-8 px-4 h-screen">
+    <div className="mx-auto py-20 px-4 h-screen">
+      <p>Date: {String(selectedDate)}</p>
       <div className="overflow-y-auto">
         {/* Right column - informational component */}
         <div className="bg-white shadow-md p-4 rounded">
           {Object.entries(itineraryReal.dayItineraries).map(([key, val]) => <DayItineraryComponent dayItinerary={val}/>)}
         </div>
       </div>
-    
     </div>
   );
 }
@@ -156,8 +162,7 @@ function App() {
   const [data, setData] = useState(null);
   // State to track loading state
   const [loading, setLoading] = useState(true);
-  // State to track error state
-  const [error, setError] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(new Date());
 
   var csvUrlForItinerary = "";
   var csvUrlForAccomodation = "";
@@ -194,13 +199,11 @@ function App() {
       });
   }, []);
 
-  console.log(process.env.REACT_APP_ENV);
-
   return (
     <div className="App container bg-gray-100 min-h-screen max-w-lg">
-      <Navbar />
+      <Navbar selectedDate={selectedDate} setSelectedDate={setSelectedDate} />
       {loading && <p>Loading itinerary!</p>}
-      {data && (<MainSection itinerary={data} />)}
+      {data && (<MainSection itinerary={data} selectedDate={selectedDate} setSelectedDate={setSelectedDate} />)}
     </div>
   )
 };

@@ -45,8 +45,21 @@ function enumerateDates(startDateStr, endDateStr, includeEndDate = false) {
     } else {
         return dates.slice(0, -1);
     }
-
-    
 }
 
-export {formatDateToHumanReadable, formatDate, enumerateDates};
+// Convert MM-DD-YYYY string into a Date obj
+function formatStringToDate(strDate) {
+    const [month, day, year] = strDate.split("-");
+    return new Date(year, month - 1, day);
+}
+
+// date is a Date() obj
+// Returns date-YYYY-MM-DD
+function formatDateForId(date) {
+
+
+    const formattedDate = date.toISOString().split('T')[0];
+    return "date-" + formattedDate;
+}
+
+export {formatDateToHumanReadable, formatDate, enumerateDates, formatDateForId, formatStringToDate};
