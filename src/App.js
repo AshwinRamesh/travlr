@@ -24,9 +24,11 @@ const CalendarPicker = (props) => {
     const element = document.getElementById(idName);
     if (element) {
       element.scrollIntoView();
+    
     } else {
       console.log("Cannot find element" + idName);
     }
+    
     console.log(date);
   };
 
