@@ -118,6 +118,7 @@ const DayItineraryComponent = (props) => {
   const { dayItinerary } = props;
   const date = formatStringToDate(dayItinerary.date)
   const idName = formatDateForId(date);
+  console.log(date, idName);
 
   return (
     <div id={idName} className='bg-gray-200 rounded-lg shadow-lg pb-2 mb-10'>
@@ -140,17 +141,13 @@ const DayItineraryComponent = (props) => {
 
 const MainSection = (props) => {
   const itineraryReal = props.itinerary;
-  const selectedDate = props.selectedDate;
-  const setSelectedDate = props.setSelectedDate;
 
   return (
-    <div className="mx-auto px-4 h-screen">
-      <div className="overflow-y-auto">
+    <div className="mx-auto px-4 h-screen overflow-y-auto">
         {/* Right column - informational component */}
         <div className="bg-white shadow-md p-4 rounded">
           {Object.entries(itineraryReal.dayItineraries).map(([key, val]) => <DayItineraryComponent dayItinerary={val}/>)}
         </div>
-      </div>
     </div>
   );
 }

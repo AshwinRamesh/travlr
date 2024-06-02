@@ -54,12 +54,13 @@ function formatStringToDate(strDate) {
 }
 
 // date is a Date() obj
-// Returns date-YYYY-MM-DD
+// Returns date-YYYY-MM-DD in the current TZ of the browser
 function formatDateForId(date) {
-
-
-    const formattedDate = date.toISOString().split('T')[0];
-    return "date-" + formattedDate;
+  const year = String(date.getFullYear());
+  const month = date.getMonth() + 1 < 10 ? "0" + String(date.getMonth() + 1) : String(date.getMonth() + 1);
+  const day = date.getDate() < 10 ? "0" + String(date.getDate()) : String(date.getDate());
+  const formattedDate = "date-" + year + "-" + month + "-" + day;
+  return formattedDate;
 }
 
 export {formatDateToHumanReadable, formatDate, enumerateDates, formatDateForId, formatStringToDate};
