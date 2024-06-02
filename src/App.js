@@ -15,7 +15,7 @@ function generateMapUrl(query) {
 const CalendarPicker = (props) => {
   const [startDate, setStartDate] = useState(new Date());
   const selectedDate = props.selectedDate;
-  const setSelectedDate = props.setSelectedDate;
+  const setSelectedDate = props.setSelectedDate; // TODO - does this break the rendering?
 
   const handleDateChange = (date) => {
     setSelectedDate(date);
@@ -30,6 +30,8 @@ const CalendarPicker = (props) => {
     console.log(date);
   };
 
+  console.log("rerender with date", selectedDate);
+
   return (
     <div>
       <DatePicker
@@ -37,6 +39,7 @@ const CalendarPicker = (props) => {
         className='rounded border-solid border-2 px-2 border-slate-600'
         selected={selectedDate}
         onChange={handleDateChange}
+        onKeyDown={(e) => e.preventDefault()}
       />
     </div>
   );
@@ -118,7 +121,6 @@ const DayItineraryComponent = (props) => {
   const { dayItinerary } = props;
   const date = formatStringToDate(dayItinerary.date)
   const idName = formatDateForId(date);
-  console.log(date, idName);
 
   return (
     <div id={idName} className='bg-gray-200 rounded-lg shadow-lg pb-2 mb-10'>
