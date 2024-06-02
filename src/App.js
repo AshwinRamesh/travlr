@@ -86,7 +86,6 @@ const ActivityComponent = (props) => {
   
 
   const toggleCollapse = () => {
-    console.log("Trigger collapse", isCollapsed);
     setIsCollapsed(!isCollapsed);
   };
 
