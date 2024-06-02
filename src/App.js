@@ -41,6 +41,7 @@ const CalendarPicker = (props) => {
         onChange={handleDateChange}
         onKeyDown={(e) => e.preventDefault()}
       />
+      <p>{String(selectedDate)}</p>
     </div>
   );
 };
