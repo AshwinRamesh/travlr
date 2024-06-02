@@ -144,8 +144,7 @@ const MainSection = (props) => {
   const setSelectedDate = props.setSelectedDate;
 
   return (
-    <div className="mx-auto py-20 px-4 h-screen">
-      <p>Date: {String(selectedDate)}</p>
+    <div className="mx-auto px-4 h-screen">
       <div className="overflow-y-auto">
         {/* Right column - informational component */}
         <div className="bg-white shadow-md p-4 rounded">
