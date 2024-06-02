@@ -43,7 +43,6 @@ const CalendarPicker = (props) => {
         onChange={handleDateChange}
         onKeyDown={(e) => e.preventDefault()}
       />
-      <p>{String(selectedDate)}</p>
     </div>
   );
 };
@@ -147,7 +146,7 @@ const MainSection = (props) => {
   const itineraryReal = props.itinerary;
 
   return (
-    <div className="mx-auto px-4 h-screen overflow-y-auto">
+    <div className="mx-auto px-4 h-screen overflow-y-auto mt-20">
         {/* Right column - informational component */}
         <div className="bg-white shadow-md p-4 rounded">
           {Object.entries(itineraryReal.dayItineraries).map(([key, val]) => <DayItineraryComponent dayItinerary={val}/>)}
