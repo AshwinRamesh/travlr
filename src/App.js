@@ -42,6 +42,7 @@ const CalendarPicker = (props) => {
         selected={selectedDate}
         onChange={handleDateChange}
         onKeyDown={(e) => e.preventDefault()}
+        customInput={<input inputMode='none' />}
       />
     </div>
   );
