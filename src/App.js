@@ -24,6 +24,7 @@ const CalendarPicker = (props) => {
     const element = document.getElementById(idName);
     if (element) {
       element.scrollIntoView();
+      window.scrollBy(0,-90);
     
     } else {
       console.log("Cannot find element" + idName);
@@ -147,7 +148,7 @@ const MainSection = (props) => {
   const itineraryReal = props.itinerary;
 
   return (
-    <div className="mx-auto px-4 h-screen overflow-y-auto mt-20">
+    <div className="mx-auto px-4 h-screen mt-20">
         {/* Right column - informational component */}
         <div className="bg-white shadow-md p-4 rounded">
           {Object.entries(itineraryReal.dayItineraries).map(([key, val]) => <DayItineraryComponent dayItinerary={val}/>)}
