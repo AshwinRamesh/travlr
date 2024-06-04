@@ -24,13 +24,11 @@ const CalendarPicker = (props) => {
     const element = document.getElementById(idName);
     if (element) {
       element.scrollIntoView();
-      window.scrollBy(0,-90);
+      window.scrollBy(0,-90); // Required as the navbar currently hides the top 90~ px
     
     } else {
       console.log("Cannot find element" + idName);
     }
-    
-    console.log(date);
   };
 
   console.log("rerender with date", selectedDate);
