@@ -18,10 +18,10 @@ class Trip(models.Model):
     end_date = models.DateField()
 
 
-
 class DayItinerary(models.Model):
     # Nane of the day, will be auto suggestted based on activities and accom.
     name = models.CharField(max_length=200) 
+    trip = models.ForeignKey(Trip, null=True, on_delete=models.PROTECT)
     date = models.DateField()
     notes = models.TextField()
 
@@ -41,6 +41,7 @@ class Activity(models.Model):
     # TODO - timezones?
     date = models.DateField()
     time = models.TimeField()  # Optional time for activity
+    trip = models.ForeignKey(Trip, null=True, on_delete=models.PROTECT)
     day_itinerary = models.ForeignKey(DayItinerary, null=True, on_delete=models.SET_NULL)
 
     # TODO method to get costs
@@ -54,6 +55,8 @@ class Accomodation(models.Model):
     notes = models.TextField()
     status = models.CharField(max_length=3, choices=CONFIRMATION_STATUS_VALS)
     
+    trip = models.ForeignKey(Trip, null=True, on_delete=models.PROTECT)
+
     cost = models.DecimalField(max_digits=10, decimal_places=2)
     currency = models.CharField(max_length=2)  # TODO
 
@@ -81,6 +84,7 @@ class DayCost(models.Model):
     cost_type = models.CharField(max_length=3, choices=COST_TYPES)
     notes = models.TextField()
     
+    trip = models.ForeignKey(Trip, null=True, on_delete=models.PROTECT)
     activity = models.ForeignKey(Activity, null=True, on_delete=models.SET_NULL)
 
     cost = models.DecimalField(max_digits=10, decimal_places=2)
