@@ -11,6 +11,7 @@ class TripSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+# TODO - this should also create all the days in the trip.
 class TripCreateView(generics.CreateAPIView):
     queryset = Trip.objects.all()
     serializer_class = TripSerializer
@@ -22,3 +23,20 @@ class TripGetView(generics.RetrieveAPIView):
     serializer_class = TripSerializer
     http_method_names = ['get',]
     
+
+# TODO - UpdateTripDatesAPI
+
+# TODO - DayItineraryAPIs: edit notes, edit name of the day, get (add costs here too.)
+
+# TODO - ActivityAPIs - create, edit, delete
+
+# TODO - AccomodationAPI - CRUD
+
+# TODO - DayCostAPI - CRUD
+
+# TODO - CostsDashboardAPI
+    # - Current total spend
+    # - accomodation spend / day (only booked accom)
+    # - food spend / day
+    # - trabel spend / day
+    # - Remaining budget (optional)

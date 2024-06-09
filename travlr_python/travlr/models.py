@@ -16,6 +16,8 @@ class Trip(models.Model):
     name = models.CharField(max_length=200)
     start_date = models.DateField()
     end_date = models.DateField()
+    # TODO - maybe add currency here?
+    # TODO - maybe add budget here?
 
 
 class DayItinerary(models.Model):
@@ -24,6 +26,12 @@ class DayItinerary(models.Model):
     trip = models.ForeignKey(Trip, null=True, on_delete=models.PROTECT)
     date = models.DateField()
     notes = models.TextField()
+
+    # Cached cost fields - recomputed everytime a new update is made.
+    accomodation_costs = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
+    food_costs = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
+    travel_costs = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
+    other_costs = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
 
     # TODO - helpers to get all activities, costs, accomodations
     # TODO - accom can have multiple potentially, so let's keep it as a query instead of fully mapped.
