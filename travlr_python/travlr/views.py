@@ -1,3 +1,4 @@
+from calendar import Day
 from datetime import timedelta
 
 from django import forms
@@ -18,7 +19,7 @@ class APIMixinView():
         'message': 'No updates made',
     }, status=status.HTTP_200_OK)
 
-    def field_validation_with_better_error_message(self, form_field: forms.Field, field_name: str, val):
+    def validate_param(self, form_field: forms.Field, field_name: str, val):
         try:
             return form_field.clean(val)
         except ValidationError as e:
@@ -42,6 +43,7 @@ class APIMixinView():
 # Basic views here
 
 class EditTripView(View, APIMixinView):
+    # TODO - UpdateTripDatesAPI
 
     def post(self, request: HttpRequest, *args, **kwargs):
         trip_id = request.POST.get('trip_id')
@@ -50,8 +52,8 @@ class EditTripView(View, APIMixinView):
 
     # TODO - allow to edit dates, "delete"
     def _edit_trip(self, request: HttpRequest, trip_id, name=None):
-        trip_id = self.field_validation_with_better_error_message(forms.IntegerField(), 'trip_id', trip_id)
-        name = self.field_validation_with_better_error_message(forms.CharField(), 'name', name)
+        trip_id = self.validate_param(forms.IntegerField(), 'trip_id', trip_id)
+        name = self.validate_param(forms.CharField(), 'name', name)
 
         if name is None:
             raise ValidationError("Atleast on of the following fields need to have a change - 'name'")
@@ -72,7 +74,7 @@ class GetTripView(View, APIMixinView):
         return self.exception_handling_method(self._get_trip_by_id, request, trip_id)
 
     def _get_trip_by_id(self, request, trip_id):
-        trip_id = self.field_validation_with_better_error_message(forms.IntegerField(), 'trip_id', trip_id)
+        trip_id = self.validate_param(forms.IntegerField(), 'trip_id', trip_id)
         trip = Trip.objects.get(pk=trip_id)
         return JsonResponse(data={
             'id': trip.pk,
@@ -117,13 +119,43 @@ class CreateTripView(View, APIMixinView):
                 'end_date': trip.end_date
             })
 
-# TODO - UpdateTripDatesAPI
 
 # TODO - DayItineraryAPIs: edit notes, edit name of the day, get (add costs here too.)
+class DayItineraryView(View, APIMixinView):
+
+    # trip_id - PK for Trip
+    # day - string formatted day YYYY-MM-DD
+    def get(self, request: HttpRequest, trip_id, day, *args, **kwargs):
+        return self.exception_handling_method(self._get_day_itinerary, request, trip_id, day)
+
+    def post(self, request: HttpRequest, trip_id, day, *args, **kwargs):
+        pass # TODO
+
+    def _get_day_itinerary(self, request: HttpRequest, trip_id, day):
+
+        # Field validation
+        trip_id = self.validate_param(forms.IntegerField(), 'trip_id', trip_id)
+        day_date = self.validate_param(forms.DateField(), 'day', day)
+
+        # Logic
+        day = DayItinerary.objects.filter(trip_id__exact=trip_id, date__exact=day_date).first()
+        if not day:
+            raise Exception("Day does not exist - {}".format(day_date))
+
+        return JsonResponse(data={
+            'trip_id': day.trip_id,
+            'name': day.name,
+            'date': day.date,
+            'notes': day.notes,
+            # TODO - costs!
+        })
+
+    def _edit_day_itinerary(self, request: HttpRequest, trip_id, day):
+        pass # TODO
 
 # TODO - ActivityAPIs - create, edit, delete
 
-# TODO - AccomodationAPI - CRUD
+# TODO - AccommodationAPI - CRUD
 
 # TODO - DayCostAPI - CRUD
 
