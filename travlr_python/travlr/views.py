@@ -1,17 +1,13 @@
 from datetime import timedelta
 
+from django import forms
 from django.core.exceptions import ValidationError
-from django.shortcuts import render
-from rest_framework import serializers, generics
-from rest_framework.response import Response
-from rest_framework import status
 from django.db import transaction
 from django.http import JsonResponse, HttpRequest
-from django import forms
 from django.views import View
+from rest_framework import status
 
 from .models import DayItinerary, Trip
-from django.views.decorators.http import require_http_methods
 
 
 # Mixins
@@ -21,6 +17,13 @@ class APIMixinView():
     NO_UPDATE_RESPONSE = JsonResponse(data={
         'message': 'No updates made',
     }, status=status.HTTP_200_OK)
+
+    def field_validation_with_better_error_message(self, form_field: forms.Field, field_name: str, val):
+        try:
+            return form_field.clean(val)
+        except ValidationError as e:
+            e.message = "{} - {}".format(field_name, e.message)
+            raise e
 
     def exception_handling_method(self, method, *args, **kwargs):
         try:
@@ -42,12 +45,12 @@ class EditTripView(View, APIMixinView):
     def post(self, request: HttpRequest, *args, **kwargs):
         trip_id = request.POST.get('trip_id')
         name = request.POST.get('name')
-        return self.exception_handling_method(self._edit_trip, trip_id, name)
+        return self.exception_handling_method(self._edit_trip, request, trip_id, name)
 
     # TODO - allow to edit dates, "delete"
     def _edit_trip(self, request: HttpRequest, trip_id, name=None):
-        trip_id = forms.IntegerField().clean(trip_id)
-        name = forms.CharField(required=False).clean(name)
+        trip_id = self.field_validation_with_better_error_message(forms.IntegerField(), 'trip_id', trip_id)
+        name = self.field_validation_with_better_error_message(forms.CharField(), 'name', name)
 
         if name is None:
             raise ValidationError("Atleast on of the following fields need to have a change - 'name'")
@@ -64,13 +67,12 @@ class EditTripView(View, APIMixinView):
         }, status=status.HTTP_200_OK)
 
 class GetTripView(View, APIMixinView):
-    def get(self, request: HttpRequest, *args, **kwargs):
-        pk = request.GET.get('pk')
-        return self.exception_handling_method(self._get_trip_by_id, request, pk)
+    def get(self, request: HttpRequest, trip_id, *args, **kwargs):
+        return self.exception_handling_method(self._get_trip_by_id, request, trip_id)
 
     def _get_trip_by_id(self, request, trip_id):
-        trip_id = forms.IntegerField().clean(trip_id)
-        trip = Trip.objects.get(pk=pk)
+        trip_id = self.field_validation_with_better_error_message(forms.IntegerField(), 'trip_id', trip_id)
+        trip = Trip.objects.get(pk=trip_id)
         return JsonResponse(data={
             'id': trip.pk,
             'name': trip.name,
@@ -90,7 +92,10 @@ class CreateTripView(View, APIMixinView):
 
     def _create_trip(self, request, name, start_date, end_date):
 
-        # TODO add field validation
+        # Field validation
+        name = forms.CharField().clean(name)
+        start_date = forms.DateField().clean(start_date)
+        end_date = forms.DateField().clean(end_date)
 
         if end_date <= start_date:
             raise forms.ValidationError('end_date must be > start_date')
@@ -110,65 +115,6 @@ class CreateTripView(View, APIMixinView):
                 'start_date': trip.start_date,
                 'end_date': trip.end_date
             })
-
-
-# DRF views below
-
-class TripSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Trip
-        fields = '__all__'
-
-
-class TripApiCreateView(generics.GenericAPIView):
-    serializer_class = TripSerializer
-    http_method_names = ['post']
-
-    def post(self, request, *args, **kwargs):
-        # Validate
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        validated_data = serializer.validated_data
-        # TODO - validate dates are correct
-
-        # Create Data
-        with transaction.atomic():
-            trip = Trip(name=validated_data['name'],
-                        start_date=validated_data['start_date'],
-                        end_date=validated_data['end_date'])
-
-            start_date = validated_data['start_date']
-            end_date = validated_data['end_date']
-            time_delta = end_date - start_date
-            trip.save()
-
-            for i in range(time_delta.days + 1):
-                day = DayItinerary(name="TBD", trip=trip, date=start_date + timedelta(days=i), notes="")
-                day.save()
-
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-
-# TODO - this should also create all the days in the trip.
-class TripCreateView(generics.CreateAPIView):
-    queryset = Trip.objects.all()
-    serializer_class = TripSerializer
-    http_method_names = ['post', ]
-
-
-class TripGetView(generics.RetrieveAPIView):
-    queryset = Trip.objects.all()
-    serializer_class = TripSerializer
-    http_method_names = ['get', ]
-
-
-class TripUpdateView(generics.UpdateAPIView):
-    queryset = Trip.objects.all()
-    serializer_class = TripSerializer
-    http_method_names = ['put', ]
-
-    def update(self, request, *args, **kwargs):
-        return super().update(request, *args, partial=True, **kwargs)
 
 # TODO - UpdateTripDatesAPI
 
