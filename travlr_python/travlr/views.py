@@ -25,6 +25,7 @@ class APIMixinView():
             e.message = "{} - {}".format(field_name, e.message)
             raise e
 
+    # TODO - this has a bug where error messages are getting wrapped in list formatting. Not a big deal yet.
     def exception_handling_method(self, method, *args, **kwargs):
         try:
             return method(*args, **kwargs)
