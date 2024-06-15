@@ -19,13 +19,13 @@ export class Activity {
                 return {
                     'emoji': "🏠",
                     'altText': "Accomodation",
-                    'color': 'bg-pink-800'
+                    'color': 'bg-activity-accommodation'
                 };
             case "Food":
                 return {
-                    'emoji': "🍔",
+                    'emoji': "🍔 🍺",
                     'altText': 'Food',
-                    'color': 'bg-blue-800'
+                    'color': 'bg-activity-food'
                 };
             case "Flight":
                 return {
@@ -35,16 +35,23 @@ export class Activity {
                 };
             case "Check-In":
                 return {
-                    'emoji': "➡️🏠",
+                    'emoji': "➡️ 🏠",
                     'altText': 'Check-In',
-                    'color': 'bg-pink-800'
+                    'color': 'bg-activity-accommodation'
 
                 };
             case "Check-Out":
                 return {
-                    'emoji': "🏠➡️",
+                    'emoji': "🏠 ➡️",
                     'altText': 'Check-Out',
-                    'color': 'bg-pink-800'
+                    'color': 'bg-activity-accommodation'
+                };
+
+            case "Sightseeing":
+                return {
+                    'emoji': "📸",
+                    'altText': 'Check-Out',
+                    'color': 'bg-activity-sightseeing'
                 };
             default:
                 return {
