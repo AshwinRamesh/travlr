@@ -24,14 +24,12 @@ const CalendarPicker = (props) => {
     const element = document.getElementById(idName);
     if (element) {
       element.scrollIntoView();
-      window.scrollBy(0,-90); // Required as the navbar currently hides the top 90~ px
+      window.scrollBy(0,-90); //  TODO - fix: Required as the navbar currently hides the top 90~ px
     
     } else {
       console.log("Cannot find element" + idName);
     }
   };
-
-  console.log("rerender with date", selectedDate);
 
   return (
     <div>
@@ -75,7 +73,7 @@ const AccomodationComponent = (props) => {
   return (
     <div class="rounded bg-glade-green-200 mx-2 px-2 w-full">
       <h2 className='text-lg font-semibold'>🏚️ Accomodation</h2>
-      <p>No accomodation booked!</p>
+      <p>No accommodation booked!</p>
     </div>
   );
   
@@ -96,22 +94,29 @@ const ActivityComponent = (props) => {
         <p className='text-md text-white text-center'>{activity.mapType().emoji}</p>
       </div>
       
-      <div class="w-3/4 p-4">
+      <div class="w-3/4 p-2">
         
         <div onClick={toggleCollapse}>
-          <span className="text-l font-bold mb-2">{activity.name}</span>
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className={`h-4 w-4 transform transition-transform duration-300 ${isCollapsed ? 'rotate-180' : ''}`}>
-            <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414zM10 18a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
-          </svg>
+          <span className="text-sm font-bold mb-2">
+            {activity.name + " "}
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
+                className={`inline h-4 w-4 transform transition-transform duration-300 ${isCollapsed ? 'rotate-180' : ''}`}>
+              <path fillRule="evenodd"
+                    d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414zM10 18a1 1 0 100-2 1 1 0 000 2z"
+                    clipRule="evenodd"/>
+            </svg>
+          </span>
+
         </div>
-        
-        <div className={`overflow-hidden transition-max-height duration-300 ${isCollapsed ? 'max-h-screen' : 'max-h-0'}`}>
-          <div className="px-4 py-2">
-            <p class="text-gray-700">Address - {activity.address}</p>
-            <p class="text-gray-700">Notes - {activity.details}</p>
-          </div>
+
+        <div
+            className={`text-sm text-left overflow-hidden transition-max-height duration-300 ${isCollapsed ? 'max-h-screen' : 'max-h-0'}`}>
+            <div className="px-4 py-2">
+                <p class="text-gray-700">Address - {activity.address}</p>
+                <p class="text-gray-700">Notes - {activity.details}</p>
+            </div>
         </div>
-        
+
       </div>
     </div>
   )

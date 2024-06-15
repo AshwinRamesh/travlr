@@ -21,7 +21,13 @@ module.exports = {
           '800': '#334833',
           '900': '#2b3c2b',
           '950': '#141f15',
+        },
+        'activity': {
+          'accommodation': '#FFD166',
+          'food': '#118AB2',
+          'sightseeing': '#073B4C'
         }
+        
     },
     
   },
