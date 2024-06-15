@@ -50,12 +50,12 @@ class Activity(models.Model):
     date = models.DateField()
     time = models.TimeField()  # Optional time for activity
     trip = models.ForeignKey(Trip, null=True, on_delete=models.PROTECT)
-    day_itinerary = models.ForeignKey(DayItinerary, null=True, on_delete=models.SET_NULL)
+    day_itinerary = models.ForeignKey(DayItinerary, null=True, on_delete=models.SET_NULL) # TODO - maybe don't need to use?
 
     # TODO method to get costs
 
 
-class Accomodation(models.Model):
+class Accommodation(models.Model):
     name = models.CharField(max_length=200) 
     country = models.CharField(max_length=200) 
     city = models.CharField(max_length=200) 

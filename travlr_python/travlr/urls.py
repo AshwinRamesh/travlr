@@ -10,5 +10,9 @@ urlpatterns = [
     path('trip/update/', csrf_exempt(views.EditTripView.as_view()), name='trip-update'),
 
     # Day APIs
-    path('trip/<int:trip_id>/day/<str:day>/', csrf_exempt(views.DayItineraryView.as_view()), name='day-update'),
+    path('trip/<int:trip_id>/day/<str:day>/', csrf_exempt(views.DayItineraryView.as_view()), name='day-get-by-date'),
+    path('trip/<int:trip_id>/day/', csrf_exempt(views.DayItineraryView.as_view()), name='day-get-all'),
+    path('trip/day/update/', csrf_exempt(views.DayItineraryView.as_view()), name='day-update'),
+
+
 ]
