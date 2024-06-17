@@ -1,4 +1,3 @@
-from calendar import Day
 from datetime import timedelta
 
 from django import forms
@@ -8,7 +7,8 @@ from django.http import JsonResponse, HttpRequest
 from django.views import View
 from rest_framework import status
 
-from .models import DayItinerary, Trip, Activity, CONFIRMATION_STATUS_VALS
+from .domain.accomodation import get_accommodation, create_or_update_accommodation
+from .models import DayItinerary, Trip, Activity, CONFIRMATION_STATUS_VALS, Accommodation
 
 
 # Mixins
@@ -203,17 +203,17 @@ class ActivityView(View, APIMixinView):
     @staticmethod
     def map_activity(activity: Activity):
         return {
-                'id': activity.id,
-                'name': activity.name,
-                'country': activity.country,
-                'city': activity.city,
-                'address': activity.address,
-                'status': activity.status,
-                'notes': activity.notes,
-                'date': activity.date,
-                'time': activity.time,
-                'trip': activity.trip_id,
-            }
+            'id': activity.id,
+            'name': activity.name,
+            'country': activity.country,
+            'city': activity.city,
+            'address': activity.address,
+            'status': activity.status,
+            'notes': activity.notes,
+            'date': activity.date,
+            'time': activity.time,
+            'trip': activity.trip_id,
+        }
 
     def get(self, request: HttpRequest, *args, **kwargs):
         trip_id = kwargs.get('trip_id')
@@ -258,16 +258,16 @@ class ActivityView(View, APIMixinView):
         country = self.validate_param(forms.CharField(), 'country', country)
         city = self.validate_param(forms.CharField(), 'city', city)
 
-        time = self.validate_param(forms.TimeField(required=False), 'time', time) # TODO - need to understand format
+        time = self.validate_param(forms.TimeField(required=False), 'time', time)  # TODO - need to understand format
         address = self.validate_param(forms.CharField(required=False), 'address', address)
-        status = self.validate_param(forms.CharField(required=False), 'status', status) # TODO - validate choices
+        status = self.validate_param(forms.CharField(required=False), 'status', status)  # TODO - validate choices
         notes = self.validate_param(forms.CharField(required=False), 'notes', notes)
 
         trip = Trip.objects.get(id=trip_id)
         if date < trip.start_date or date > trip.end_date:
             raise ValidationError("Date must be between {} and {}".format(trip.start_date, trip.end_date))
 
-        if status not in CONFIRMATION_STATUS_VALS.keys(): # TODO - not sure this works yet
+        if status not in CONFIRMATION_STATUS_VALS.keys():  # TODO - not sure this works yet
             raise ValidationError("Status is invalid")
 
         # Create activity and save
@@ -287,7 +287,8 @@ class ActivityView(View, APIMixinView):
         return JsonResponse(data=self.map_activity(activity), status=status.HTTP_201_CREATED)
 
     # Must send all fields - always get overridden.
-    def _edit_activity(self, request: HttpRequest, trip_id, activity_id, name, country, city, address, status, notes, date, time):
+    def _edit_activity(self, request: HttpRequest, trip_id, activity_id, name, country, city, address, status, notes,
+                       date, time):
         # Validation
         trip_id = self.validate_param(forms.IntegerField(), 'trip_id', trip_id)
         activity_id = self.validate_param(forms.IntegerField(), 'activity_id', activity_id)
@@ -296,9 +297,9 @@ class ActivityView(View, APIMixinView):
         country = self.validate_param(forms.CharField(), 'country', country)
         city = self.validate_param(forms.CharField(), 'city', city)
 
-        time = self.validate_param(forms.TimeField(required=False), 'time', time) # TODO - need to understand format
+        time = self.validate_param(forms.TimeField(required=False), 'time', time)  # TODO - need to understand format
         address = self.validate_param(forms.CharField(required=False), 'address', address)
-        status = self.validate_param(forms.CharField(required=False), 'status', status) # TODO - validate choices
+        status = self.validate_param(forms.CharField(required=False), 'status', status)  # TODO - validate choices
         notes = self.validate_param(forms.CharField(required=False), 'notes', notes)
 
         activity = Activity.objects.filter(id=activity_id, trip_id__exact=trip_id).get()
@@ -315,20 +316,35 @@ class ActivityView(View, APIMixinView):
         return JsonResponse(data=self.map_activity(activity), status=status.HTTP_200_OK)
 
 
-# TODO - AccommodationAPI - CRUD
 class AccommodationView(View, APIMixinView):
+
+    @staticmethod
+    def map_accommodation(accommodation: Accommodation):
+        return {
+            'id': accommodation.id,
+            'trip_id': accommodation.trip_id,
+            'date': accommodation.date,
+            'name': accommodation.name,
+            'country': accommodation.country,
+            'city': accommodation.city,
+            'address': accommodation.address,
+            'status': accommodation.status,
+            'notes': accommodation.notes,
+            'cost': accommodation.cost,
+            'currency': accommodation.currency,
+            'checkin_date': accommodation.checkin_date,
+            'checkout_date': accommodation.checkout_date,
+            'checkin_time': accommodation.checkin_time,
+            'checkout_time': accommodation.checkout_time,
+        }
 
     def get(self, request: HttpRequest, *args, **kwargs):
         trip_id = kwargs.get('trip_id')
         accommodation_id = kwargs.get('accommodation_id')
         date = request.GET.get('date')
-
-        if accommodation_id:
-            pass # TODO - do by id (returns one item)
-        elif date:
-            pass # TODO - get by date, may return many.
-        else:
-            pass # TODO - bad request..
+        accommodations = get_accommodation(trip_id, accommodation_id=accommodation_id, date=date)
+        return JsonResponse(data=[self.map_accommodation(a) for a in accommodations],
+                            status=status.HTTP_200_OK)
 
     def post(self, request: HttpRequest, *args, **kwargs):
         trip_id = request.POST.get('trip_id')
@@ -345,7 +361,11 @@ class AccommodationView(View, APIMixinView):
         checkout_date = request.POST.get('checkout_date')
         checkin_time = request.POST.get('checkin_time')
         checkout_time = request.POST.get('checkout_time')
-        pass  #TODO
+
+        accommodation = create_or_update_accommodation(trip_id, name, country, city, address, notes, status, cost,
+                                                       currency, checkin_date, checkout_date, checkin_time,
+                                                       checkout_time, accommodation_id)
+        return JsonResponse(data=self.map_accommodation(accommodation), status=status.HTTP_201_CREATED)
 
 # TODO - DayCostAPI - CRUD
 
