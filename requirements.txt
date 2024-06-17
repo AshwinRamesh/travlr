@@ -10,3 +10,5 @@ Markdown==3.6
 MarkupSafe==2.1.5
 sqlparse==0.5.0
 Werkzeug==3.0.3
+
+requests~=2.32.3

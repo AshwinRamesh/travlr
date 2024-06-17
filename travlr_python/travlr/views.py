@@ -8,7 +8,23 @@ from django.views import View
 from rest_framework import status
 
 from .domain.accomodation import get_accommodation, create_or_update_accommodation
+from .domain.activity import update_activity, get_activities_by_date
+from .domain.trip import update_trip, get_trip, create_trip
 from .models import DayItinerary, Trip, Activity, CONFIRMATION_STATUS_VALS, Accommodation
+
+
+def exception_handling_view(func):
+    def inner(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except ValidationError as e:
+            return JsonResponse(data={
+                'error': str(e),
+            }, status=400)
+        except Exception as e:  # TODO - throw exception if in debug mode?
+            return JsonResponse(data={
+                'error': str(e),
+            }, status=500)
 
 
 # Mixins
@@ -43,24 +59,11 @@ class APIMixinView():
 
 class EditTripView(View, APIMixinView):
     # TODO - UpdateTripDatesAPI
-
+    @exception_handling_view
     def post(self, request: HttpRequest, *args, **kwargs):
         trip_id = request.POST.get('trip_id')
         name = request.POST.get('name')
-        return self.exception_handling_method(self._edit_trip, request, trip_id, name)
-
-    # TODO - allow to edit dates, "delete"
-    def _edit_trip(self, request: HttpRequest, trip_id, name=None):
-        trip_id = self.validate_param(forms.IntegerField(), 'trip_id', trip_id)
-        name = self.validate_param(forms.CharField(), 'name', name)
-
-        if name is None:
-            raise ValidationError("Atleast on of the following fields need to have a change - 'name'")
-
-        trip = Trip.objects.get(pk=trip_id)
-        trip.name = name
-        trip.save()
-
+        trip = update_trip(trip_id, name)
         return JsonResponse(data={
             'id': trip.pk,
             'name': trip.name,
@@ -70,12 +73,9 @@ class EditTripView(View, APIMixinView):
 
 
 class GetTripView(View, APIMixinView):
+    @exception_handling_view
     def get(self, request: HttpRequest, trip_id, *args, **kwargs):
-        return self.exception_handling_method(self._get_trip_by_id, request, trip_id)
-
-    def _get_trip_by_id(self, request, trip_id):
-        trip_id = self.validate_param(forms.IntegerField(), 'trip_id', trip_id)
-        trip = Trip.objects.get(pk=trip_id)
+        trip = get_trip(trip_id)
         return JsonResponse(data={
             'id': trip.pk,
             'name': trip.name,
@@ -85,40 +85,21 @@ class GetTripView(View, APIMixinView):
 
 
 class CreateTripView(View, APIMixinView):
-
+    @exception_handling_view
     # Create Trip
     def post(self, request: HttpRequest, *args, **kwargs):
         params = request.POST
         name = params.get('name')
         start_date = params.get('start_date')
         end_date = params.get('end_date')
-        return self.exception_handling_method(self._create_trip, request, name, start_date, end_date)
 
-    def _create_trip(self, request, name, start_date, end_date):
-
-        # Field validation
-        name = forms.CharField().clean(name)
-        start_date = forms.DateField().clean(start_date)
-        end_date = forms.DateField().clean(end_date)
-
-        if end_date <= start_date:
-            raise forms.ValidationError('end_date must be > start_date')
-
-        with transaction.atomic():
-            trip = Trip(name=name, start_date=start_date, end_date=end_date)
-            trip.save()
-
-            time_delta = end_date - start_date
-            for i in range(time_delta.days + 1):
-                day = DayItinerary(name="TBD", trip=trip, date=start_date + timedelta(days=i), notes="")
-                day.save()
-
-            return JsonResponse(data={
-                'id': trip.pk,
-                'name': trip.name,
-                'start_date': trip.start_date,
-                'end_date': trip.end_date
-            })
+        trip = create_trip(name, start_date, end_date)['trip']
+        return JsonResponse(data={
+            'id': trip.pk,
+            'name': trip.name,
+            'start_date': trip.start_date,
+            'end_date': trip.end_date
+        })
 
 
 # TODO - DayItineraryAPIs: get costs (add costs here too.)
@@ -126,6 +107,7 @@ class DayItineraryView(View, APIMixinView):
 
     # trip_id - PK for Trip
     # day - string formatted day YYYY-MM-DD
+
     def get(self, request: HttpRequest, *args, **kwargs):
         trip_id = kwargs.get('trip_id')
         day = kwargs.get('day')
@@ -215,10 +197,13 @@ class ActivityView(View, APIMixinView):
             'trip': activity.trip_id,
         }
 
+    @exception_handling_view
     def get(self, request: HttpRequest, *args, **kwargs):
         trip_id = kwargs.get('trip_id')
         day = kwargs.get('day')
-        return self.exception_handling_method(self._get_activities_by_day, request, trip_id, day)
+        activities = get_activities_by_date(trip_id, day)
+        return JsonResponse(data={'activities': [self.map_activity(activity) for activity in activities]},
+                            status=status.HTTP_200_OK)
 
     def post(self, request: HttpRequest, *args, **kwargs):
         trip_id = request.POST.get('trip_id')
@@ -234,22 +219,19 @@ class ActivityView(View, APIMixinView):
         time = request.POST.get('time')
 
         # Create activity
+        activity = None
         if not activity_id:
             return self.exception_handling_method(self._create_activity, request, activity_id)
 
         # Edit activity
         else:
-            return self.exception_handling_method(self._edit_activity, request)
+            activity = update_activity(trip_id, activity_id, name, country, city, address, status, notes,
+                                       date, time)
 
-    def _get_activities_by_day(self, request, trip_id, day):
-        trip_id = self.validate_param(forms.IntegerField(), 'trip_id', trip_id)
-        day = self.validate_param(forms.DateField(), 'day', day)
-
-        activities = Activity.objects.filter(trip_id__exact=trip_id, date__exact=day).all()
-        return JsonResponse(data={'activities': [self.map_activity(activity) for activity in activities]},
-                            status=status.HTTP_200_OK)
+        return JsonResponse(data=self.map_activity(activity), status=status.HTTP_200_OK)
 
     # TODO - need end time of activity?
+    @exception_handling_view
     def _create_activity(self, request: HttpRequest, trip_id, name, country, city, address, status, notes, date, time):
         # Validation
         trip_id = self.validate_param(forms.IntegerField(), 'trip_id', trip_id)
@@ -287,6 +269,7 @@ class ActivityView(View, APIMixinView):
         return JsonResponse(data=self.map_activity(activity), status=status.HTTP_201_CREATED)
 
     # Must send all fields - always get overridden.
+    @exception_handling_view
     def _edit_activity(self, request: HttpRequest, trip_id, activity_id, name, country, city, address, status, notes,
                        date, time):
         # Validation

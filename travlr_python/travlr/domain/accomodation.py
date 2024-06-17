@@ -28,7 +28,7 @@ def get_accommodation(trip_id, accommodation_id=None, date=None) -> List[Accommo
         return list(accommodation)
 
     else:
-        raise ValidationError('Either `accomodation_id` or `date` need to be given.')
+        raise ValidationError('Either `accommodation_id` or `date` need to be given.')
 
 
 def create_or_update_accommodation(trip_id, name, country, city, address, notes, status, cost,
