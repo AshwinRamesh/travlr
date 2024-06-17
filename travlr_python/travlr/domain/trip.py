@@ -22,12 +22,13 @@ def create_trip(name, start_date, end_date):
         trip.save()
 
         time_delta = end_date - start_date
+        days = []
         for i in range(time_delta.days + 1):
             day = DayItinerary(name="TBD", trip=trip, date=start_date + timedelta(days=i), notes="")
             day.save()
     return {
-        'trip': None,
-        'days': []
+        'trip': trip,
+        'days': days
     }
 
 

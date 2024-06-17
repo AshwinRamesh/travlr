@@ -1,7 +1,10 @@
 from django.db import models
 
 
-
+CONFIRMED = 'C'
+DONE = 'D'
+CANCELLED = 'X'
+IDEA = 'I'
 CONFIRMATION_STATUS_VALS = {
     'C': 'Confirmed',  # Booking or equiv confirmed for day
     'D': 'Done',  # Activity completed
@@ -70,9 +73,9 @@ class Accommodation(models.Model):
 
     # TODO - timezones?
     checkin_date = models.DateField()
-    checkin_time = models.TimeField()
+    checkin_time = models.TimeField(null=True, blank=True)
     checkout_date = models.DateField()
-    checkout_time = models.TimeField()
+    checkout_time = models.TimeField(null=True, blank=True)
 
 
 # Adhoc costs during the trip
