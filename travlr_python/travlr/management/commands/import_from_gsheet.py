@@ -23,6 +23,17 @@ class Command(BaseCommand):
         trip = trip_data['trip']
         days = trip_data['days']
         # TODO - iterate through activity file and add
+        with requests.Session() as s:
+            download = s.get(self.csvUrlForItinerary)
+
+            decoded_content = download.content.decode('utf-8')
+
+            cr = csv.reader(decoded_content.splitlines(), delimiter=',')
+            my_list = list(cr)
+            for row in my_list[1:]:
+                if row[0] != 'TRUE':
+                    continue
+
 
         # TODO - iterate through accom file and add
         with requests.Session() as s:
