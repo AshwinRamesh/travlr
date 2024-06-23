@@ -112,7 +112,7 @@ export class TripItinerary {
         const address = rawData['Address'];
 
         if (!(checkInDate && checkOutDate)) {
-            console.log("Invalid accomodation", rawData);
+            //console.log("Invalid accomodation", rawData);
             return; // Not valid accomidation.
         }
 
@@ -145,7 +145,6 @@ export class TripItinerary {
         const activityCountry = rawData["Country"];
         const activityName = rawData["Activity Name"];
         const activityDetail = rawData["Activity Details"];
-        console.log("Activity Detail", activityDetail);
 
         // Skip all activities that are accomodation related
         const accomTypeStrList = ["🏠 Accomodation", "Check In", "Check Out"];

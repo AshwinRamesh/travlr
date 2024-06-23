@@ -5,7 +5,7 @@ from django.views import View
 from rest_framework import status
 
 from .domain.accomodation import get_accommodation, create_or_update_accommodation
-from .domain.activity import update_activity, get_activities_by_date
+from .domain.activity import get_activities_by_date, create_or_update_activity
 from .domain.trip import update_trip, get_trip, create_trip
 from .models import DayItinerary, Trip, Activity, CONFIRMATION_STATUS_VALS, Accommodation
 
@@ -22,6 +22,7 @@ def exception_handling_view(func):
             return JsonResponse(data={
                 'error': str(e),
             }, status=500)
+    return inner
 
 
 # Mixins
@@ -70,7 +71,7 @@ class EditTripView(View, APIMixinView):
 
 
 class GetTripView(View, APIMixinView):
-    @exception_handling_view
+    #@exception_handling_view
     def get(self, request: HttpRequest, trip_id, *args, **kwargs):
         trip = get_trip(trip_id)
         return JsonResponse(data={
@@ -105,6 +106,7 @@ class DayItineraryView(View, APIMixinView):
     # trip_id - PK for Trip
     # day - string formatted day YYYY-MM-DD
 
+    @exception_handling_view
     def get(self, request: HttpRequest, *args, **kwargs):
         trip_id = kwargs.get('trip_id')
         day = kwargs.get('day')
@@ -222,8 +224,8 @@ class ActivityView(View, APIMixinView):
 
         # Edit activity
         else:
-            activity = update_activity(trip_id, activity_id, name, country, city, address, status, notes,
-                                       date, time)
+            activity = create_or_update_activity(trip_id, name, country, city, address, status, notes,
+                                                 date, time, activity_id=activity_id)
 
         return JsonResponse(data=self.map_activity(activity), status=status.HTTP_200_OK)
 
