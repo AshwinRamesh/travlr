@@ -65,7 +65,7 @@ def create_or_update_accommodation(trip_id, name, country, city, address, notes,
     accommodation.address = address
     accommodation.notes = notes
     accommodation.status = status
-    accommodation.cost = cost
+    accommodation.cost = cost  # TODO this should create or update the cost obj
     accommodation.currency = currency
     accommodation.checkin_date = checkin_date  # TODO - need to validate date range
     accommodation.checkout_date = checkout_date  # TODO - need to validate date range

@@ -28,7 +28,7 @@ class DayItinerary(models.Model):
     name = models.CharField(max_length=200) 
     trip = models.ForeignKey(Trip, null=True, on_delete=models.PROTECT)
     date = models.DateField()
-    notes = models.TextField()
+    notes = models.TextField(null=True, blank=True)
 
     # Cached cost fields - recomputed everytime a new update is made.
     accomodation_costs = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
@@ -42,16 +42,16 @@ class DayItinerary(models.Model):
 
 class Activity(models.Model):
     name = models.CharField(max_length=200) 
-    country = models.CharField(max_length=200) 
-    city = models.CharField(max_length=200) 
-    address = models.CharField(max_length=500)
+    country = models.CharField(max_length=200, null=True, blank=True)
+    city = models.CharField(max_length=200, null=True, blank=True)
+    address = models.CharField(max_length=500, null=True, blank=True)
     
     status = models.CharField(max_length=3, choices=CONFIRMATION_STATUS_VALS)
-    notes = models.TextField()
+    notes = models.TextField(null=True, blank=True)
     
     # TODO - timezones?
     date = models.DateField()
-    time = models.TimeField()  # Optional time for activity
+    time = models.TimeField(null=True, blank=True)  # Optional time for activity
     trip = models.ForeignKey(Trip, null=True, on_delete=models.PROTECT)
     day_itinerary = models.ForeignKey(DayItinerary, null=True, on_delete=models.SET_NULL) # TODO - maybe don't need to use?
 
@@ -62,8 +62,8 @@ class Accommodation(models.Model):
     name = models.CharField(max_length=200) 
     country = models.CharField(max_length=200) 
     city = models.CharField(max_length=200) 
-    address = models.CharField(max_length=500)
-    notes = models.TextField()
+    address = models.CharField(max_length=500, null=True, blank=True)
+    notes = models.TextField(null=True, blank=True)
     status = models.CharField(max_length=3, choices=CONFIRMATION_STATUS_VALS)
     
     trip = models.ForeignKey(Trip, null=True, on_delete=models.PROTECT)
@@ -87,7 +87,7 @@ class DayCost(models.Model):
         'ATV': 'Activity',
         'T': ' Transport',
         'S': 'Shopping',
-        'ACC': 'Accomodation',
+        'ACC': 'Accommodation',
     }
 
     name = models.CharField(max_length=200) 
