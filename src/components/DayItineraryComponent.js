@@ -10,8 +10,6 @@ export const DayItineraryComponent = (props) => {
   const setSelectedDate = props.setSelectedDate;
   const idName = formatDateForId(date);
 
-  console.log("Day Comp", typeof(selectedDate.getDate()));
-
   const incrementDate = () => {
     const newDate = selectedDate.getDate() + 1;
     selectedDate.setDate(newDate);

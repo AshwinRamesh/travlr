@@ -8,6 +8,24 @@ import {CalendarPicker} from "./components/DatePicker";
 import {MainSection} from "./components/MainSection";
 import {travlrApiClient} from "./travlrApi";
 
+// TODO - move this out of App.js
+function validateAndExtractTripIdFromPath(path) {
+  const regex = /^\/travlr\/(\d+)$/;
+  const match = path.match(regex);
+  if (match) {
+    return match[1]; // match[1] contains the captured number
+  } else {
+    return null; // Return null if the path is not valid
+  }
+}
+
+const appCtx = {
+  "currentPage": "itinerary", // One of "itinerary", "add_accom", "add_expense", "add_activity"
+  "currentDate": null,
+  "selectedDate": null,
+}
+
+
 // TODO - explore having central context object.
 function App() {
 
@@ -20,7 +38,7 @@ function App() {
 
   var csvUrlForItinerary = "";
   var csvUrlForAccomodation = "";
-  if (process.env.REACT_APP_ENV == "dev") {
+  if (process.env.REACT_APP_ENV === "dev") {
     csvUrlForItinerary = '/travlr/dev_data/itinerary.csv';
     csvUrlForAccomodation = '/travlr/dev_data/accomodation.csv';
   } else {
@@ -29,15 +47,19 @@ function App() {
   }
 
   useEffect(() => {
+    var tripId = validateAndExtractTripIdFromPath(window.location.pathname);
+    if (tripId === null) {
+      tripId = 1; // TODO - remove this and add validation
+    }
+
     var itinerary = new TripItinerary(); // TODO - maybe use "useMemo" to reduce re-rendering. Derived data.
     const activitiesCsvPromise = downloadAndParseCSV(csvUrlForItinerary);
     const accomodationCsvPromise = downloadAndParseCSV(csvUrlForAccomodation);
-    const tripDataPromise = travlrApiClient.getTrip("1");
+    const tripDataPromise = travlrApiClient.getTrip(tripId);
 
     // TODO - why is this calling the APIs twice?
     Promise.all([activitiesCsvPromise, accomodationCsvPromise, tripDataPromise])
       .then(([activitiesCsv, accomodationCsv, tripData]) => {
-        console.log("Trip data", tripData);
 
         activitiesCsv.forEach(ra => {
           itinerary.addActivityFromGSheet(ra);
@@ -61,9 +83,8 @@ function App() {
 
   return (
     <div className="App container bg-gray-100 min-h-screen max-w-lg">
-
-      <NavBar selectedDate={selectedDate} setSelectedDate={setSelectedDate}/>
-      <div className={'mt-20'}>
+      <NavBar/>
+      <div id={'page-itinerary'} className={'mt-20'}>
         {/*TODO - is this best practise to check trip then add to div? Why does the FE call API twice? */}
         <p className={'text-3xl font-bold pb-2'}>{trip && trip.name}</p>
         <div className={'mb-3'}>
@@ -80,8 +101,12 @@ function App() {
             <CalendarPicker ref={calendarRef2} selectedDate={selectedDate} setSelectedDate={setSelectedDate}/>
           </button>
         </div>
-        {loading ?  <p className='pt:5'>Loading itinerary!</p> : null}
-        {data && (<MainSection itinerary={data} selectedDate={selectedDate} setSelectedDate={setSelectedDate}/>)}
+        <div className="mx-auto px-4 h-screen">
+          <div className="bg-white shadow-md p-4 rounded">
+            {loading ?  <p className='pt:5'>Loading itinerary!</p> : null}
+            {data && (<MainSection itinerary={data} selectedDate={selectedDate} setSelectedDate={setSelectedDate}/>)}
+          </div>
+        </div>
       </div>
     </div>
   )

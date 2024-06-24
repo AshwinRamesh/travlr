@@ -5,12 +5,10 @@ import DatePicker from "react-datepicker";
 
 const CustomCalendarInput = forwardRef(function CustomCalendarInput(props, ref) {
   const onClick = props.onClick;
-  console.log("Hello cal", props, ref.current, onClick);
-  return <button id={'custom-cal-input'} className="bg-glade-green-500 hover:bg-glade-green-800 text-white font-bold py-1.5 px-4 rounded" inputMode='none' onClick={onClick} ref={ref}>📆</button>;
+  return <span id={'custom-cal-input'} className="bg-glade-green-500 hover:bg-glade-green-800 text-white font-bold py-2 px-4 rounded" inputMode='none' onClick={onClick} ref={ref}>📆</span>;
 });
 
 export const CalendarPicker = forwardRef(function CalendarPicker(props, ref) {
-  console.log(props, "potato");
   const selectedDate = props.selectedDate;
   const setSelectedDate = props.setSelectedDate; // TODO - does this break the rendering?
 

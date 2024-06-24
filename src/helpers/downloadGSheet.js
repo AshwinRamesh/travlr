@@ -38,8 +38,6 @@ const downloadAndParseCSV = (url) => {
   
             // Access the parsed data in the 'data' property of 'results'
             const parsedData = results.data;
-            //console.log(parsedData);
-            
             return parsedData;
         })
         .catch(error => {
