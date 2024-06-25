@@ -46,7 +46,7 @@ class Command(BaseCommand):
             my_list = list(cr)
             for row in my_list[1:]:
                 date = self._convert_date_format(row[2])
-                if row[1] != 'TRUE' or not date:
+                if row[1] != 'TRUE' or not date or row[6] in ('🏠 Accomodation', 'Check Out', 'Check In'):
                     continue
 
                 try:

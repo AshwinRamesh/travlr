@@ -33,7 +33,7 @@ def create_or_update_activity(trip_id, name, country, city, address, status, not
         if activity_id:
                 activity = Activity.objects.filter(id=activity_id, trip_id__exact=trip_id).get()
         else:
-                activity = Activity()
+                activity = Activity(trip_id=trip.id)
 
         # Update all fields
         activity.date = date

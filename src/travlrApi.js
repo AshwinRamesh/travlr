@@ -22,8 +22,17 @@ class TravlrApi {
     return null;
   }
 
-  getTripItinerary(id) {
-    return  null;
+  getTripItineraryForDate(id, date) {
+    return fetch(this.baseUrl + "/api/trip/" + id + "/day/" + date)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to get Trip Itinerary with id: ' + id + ' and date ' + date);
+            }
+            return response.json();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
   }
 
 }

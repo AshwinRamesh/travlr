@@ -23,8 +23,9 @@ def get_accommodation(trip_id, accommodation_id=None, date=None) -> List[Accommo
 
     elif date:
         accommodation = Accommodation.objects.filter(trip_id__exact=trip_id,
-                                                     checkin_date__gte=date,
-                                                     checkout_date__lt=date).all()
+                                                     checkin_date__lte=date,
+                                                     checkout_date__gt=date).all()
+        print(accommodation.query)
         return list(accommodation)
 
     else:

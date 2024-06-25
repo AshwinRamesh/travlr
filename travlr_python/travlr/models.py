@@ -40,6 +40,7 @@ class DayItinerary(models.Model):
     # TODO - accom can have multiple potentially, so let's keep it as a query instead of fully mapped.
 
 
+# TODO - need activity type
 class Activity(models.Model):
     name = models.CharField(max_length=200) 
     country = models.CharField(max_length=200, null=True, blank=True)

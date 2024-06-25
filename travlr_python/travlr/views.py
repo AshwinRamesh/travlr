@@ -145,11 +145,18 @@ class DayItineraryView(View, APIMixinView):
         if not day:
             raise Exception("Day does not exist - {}".format(day_date))
 
+        print(day_date)
+        activities = Activity.objects.filter(trip_id__exact=trip_id, date__exact=day_date).all()
+        print(activities.query)
+        accommodation = get_accommodation(trip_id=trip_id, date=day_date)
+
         return JsonResponse(data={
             'trip_id': day.trip_id,
             'name': day.name,
             'date': day.date,
             'notes': day.notes,
+            'activities': [ActivityView.map_activity(a) for a in activities],
+            'accommodation': [AccommodationView.map_accommodation(a) for a in accommodation],
             # TODO - costs!
         })
 
@@ -305,7 +312,6 @@ class AccommodationView(View, APIMixinView):
         return {
             'id': accommodation.id,
             'trip_id': accommodation.trip_id,
-            'date': accommodation.date,
             'name': accommodation.name,
             'country': accommodation.country,
             'city': accommodation.city,

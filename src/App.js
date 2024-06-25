@@ -54,11 +54,11 @@ function App() {
 
     var itinerary = new TripItinerary(); // TODO - maybe use "useMemo" to reduce re-rendering. Derived data.
     const activitiesCsvPromise = downloadAndParseCSV(csvUrlForItinerary);
-    const accomodationCsvPromise = downloadAndParseCSV(csvUrlForAccomodation);
+    const accommodationCsvPromise = downloadAndParseCSV(csvUrlForAccomodation);
     const tripDataPromise = travlrApiClient.getTrip(tripId);
 
     // TODO - why is this calling the APIs twice?
-    Promise.all([activitiesCsvPromise, accomodationCsvPromise, tripDataPromise])
+    Promise.all([activitiesCsvPromise, accommodationCsvPromise, tripDataPromise])
       .then(([activitiesCsv, accomodationCsv, tripData]) => {
 
         activitiesCsv.forEach(ra => {
