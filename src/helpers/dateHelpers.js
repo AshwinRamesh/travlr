@@ -18,13 +18,17 @@ function formatDateToHumanReadable(dateString) {
     return `${monthName} ${parseInt(day, 10)}${daySuffix}, ${year}`;
 }
 
-function formatDate(date) {
+function formatDate(date, asIso= false) {
     // Get month, day, and year from the Date object
     const month = String(date.getMonth() + 1).padStart(2, '0'); // Month is zero-indexed
     const day = String(date.getDate()).padStart(2, '0');
     const year = date.getFullYear();
-  
-    // Concatenate the parts into the desired format "MM-DD-YYYY"
+
+    // Return "YYYY-MM-DD"
+    if (asIso) {
+      return `${year}-${month}-${day}`;
+    }
+    // Return "MM-DD-YYYY"
     return `${month}-${day}-${year}`;
 }
 

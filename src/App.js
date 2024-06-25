@@ -7,6 +7,7 @@ import {NavBar} from "./components/NavBar";
 import {CalendarPicker} from "./components/DatePicker";
 import {MainSection} from "./components/MainSection";
 import {travlrApiClient} from "./travlrApi";
+import {formatDate} from "./helpers/dateHelpers";
 
 // TODO - move this out of App.js
 function validateAndExtractTripIdFromPath(path) {
@@ -32,6 +33,7 @@ function App() {
   // State to store the fetched data
   const [data, setData] = useState(null);
   const [trip, setTrip] = useState(null);
+  const [dayItinerary, setDayItinerary] = useState(null);
   // State to track loading state
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -55,11 +57,13 @@ function App() {
     var itinerary = new TripItinerary(); // TODO - maybe use "useMemo" to reduce re-rendering. Derived data.
     const activitiesCsvPromise = downloadAndParseCSV(csvUrlForItinerary);
     const accommodationCsvPromise = downloadAndParseCSV(csvUrlForAccomodation);
+
     const tripDataPromise = travlrApiClient.getTrip(tripId);
+    const dayItineraryPromise = travlrApiClient.getTripItineraryForDate(tripId, formatDate(selectedDate, true));
 
     // TODO - why is this calling the APIs twice?
-    Promise.all([activitiesCsvPromise, accommodationCsvPromise, tripDataPromise])
-      .then(([activitiesCsv, accomodationCsv, tripData]) => {
+    Promise.all([activitiesCsvPromise, accommodationCsvPromise, tripDataPromise, dayItineraryPromise])
+      .then(([activitiesCsv, accomodationCsv, tripData, dayItineraryData]) => {
 
         activitiesCsv.forEach(ra => {
           itinerary.addActivityFromGSheet(ra);
@@ -73,12 +77,14 @@ function App() {
         // TODO - Does making multiple setFoo impact React re-render.
         setTrip(tripData);
         setData(itinerary);
+        setDayItinerary(dayItineraryData);
+        console.log(dayItinerary);
         // Set loading state to false
         setLoading(false); // TODO - remove and use the above variables to infer loading state.
 
       });
-  }, []);
-  const calendarRef2 = useRef(null);
+  }, [selectedDate]);
+  const calendarRef = useRef(null);
 // TODO - need to automatically scroll to the right part of the page based on date on first load
 
   return (
@@ -98,13 +104,13 @@ function App() {
             Add Accommodation
           </button>
           <button>
-            <CalendarPicker ref={calendarRef2} selectedDate={selectedDate} setSelectedDate={setSelectedDate}/>
+            <CalendarPicker ref={calendarRef} selectedDate={selectedDate} setSelectedDate={setSelectedDate}/>
           </button>
         </div>
         <div className="mx-auto px-4 h-screen">
           <div className="bg-white shadow-md p-4 rounded">
             {loading ?  <p className='pt:5'>Loading itinerary!</p> : null}
-            {data && (<MainSection itinerary={data} selectedDate={selectedDate} setSelectedDate={setSelectedDate}/>)}
+            {data && (<MainSection dayItinerary={dayItinerary} itinerary={data} selectedDate={selectedDate} setSelectedDate={setSelectedDate}/>)}
           </div>
         </div>
       </div>
