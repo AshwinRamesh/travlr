@@ -1,3 +1,5 @@
+from typing import List
+
 from django.core.exceptions import ValidationError
 
 from ..models import DayCost
@@ -22,3 +24,10 @@ def create_or_update_expense(trip_id, name, date, cost_type, cost, currency, not
 
     day_cost.save()
     return day_cost
+
+
+def get_expenses_for_date(trip_id, date) -> List[DayCost]:
+    trip_id = validate_param(forms.IntegerField(), 'trip_id', trip_id)
+    date = validate_param(forms.DateField(), 'date', date)
+    q = DayCost.objects.filter(trip_id=trip_id, date=date).all()
+    return list(q)

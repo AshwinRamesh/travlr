@@ -101,3 +101,6 @@ class DayCost(models.Model):
 
     cost = models.DecimalField(max_digits=10, decimal_places=2)
     currency = models.CharField(max_length=2)  # TODO
+
+    def __str__(self):
+        return "DayCost - id:{} trip_id:{} name:{} cost:{}".format(self.id, self.trip, self.name, self.cost)

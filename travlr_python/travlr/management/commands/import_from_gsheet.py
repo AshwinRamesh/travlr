@@ -108,7 +108,7 @@ class Command(BaseCommand):
                 if not first_row:
                     first_row = True
                     continue
-                if row[1]:
+                if not row[0]:  # Skip any rows where the date is empty
                     continue
                 date = self._convert_date_format(row[0])
 
@@ -120,12 +120,16 @@ class Command(BaseCommand):
                 cost_types = ['F', 'T', 'O']
 
                 for _, (cost, cost_type) in enumerate(zip(costs, cost_types)):
+                    if not cost:  # Skip empty cost.
+                        continue
                     try:
                         c = create_or_update_expense(
+                            name="{} Cost for {}".format(cost_type, date),
                             trip_id=trip.id,
                             date=date,
                             cost=cost[1:] if cost else None,
                             cost_type=cost_type,
+                            currency='AUD',
                             notes=notes,
                         )
                         print(c)

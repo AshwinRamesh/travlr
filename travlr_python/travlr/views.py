@@ -6,6 +6,7 @@ from rest_framework import status
 
 from .domain.accomodation import get_accommodation, create_or_update_accommodation
 from .domain.activity import get_activities_by_date, create_or_update_activity
+from .domain.expense import get_expenses_for_date
 from .domain.trip import update_trip, get_trip, create_trip
 from .models import DayItinerary, Trip, Activity, CONFIRMATION_STATUS_VALS, Accommodation
 
@@ -121,6 +122,7 @@ class DayItineraryView(View, APIMixinView):
 
         return self.exception_handling_method(self._edit_day_itinerary, request, trip_id, day, name, notes)
 
+    # TODO - need to refactor this to reduce duplication across conditionals.
     def _get_day_itinerary(self, request: HttpRequest, trip_id, day):
 
         # Field validation
@@ -136,6 +138,7 @@ class DayItineraryView(View, APIMixinView):
                     'name': day.name,
                     'date': day.date,
                     'notes': day.notes,
+                    'costs': [],
                     # TODO - costs
                 } for day in days
             ]}, status=status.HTTP_200_OK)
@@ -145,10 +148,12 @@ class DayItineraryView(View, APIMixinView):
         if not day:
             raise Exception("Day does not exist - {}".format(day_date))
 
-        print(day_date)
+        # print(day_date, day.date)
         activities = Activity.objects.filter(trip_id__exact=trip_id, date__exact=day_date).all()
-        print(activities.query)
+        # print(activities.query)
         accommodation = get_accommodation(trip_id=trip_id, date=day_date)
+        expenses = get_expenses_for_date(trip_id, day_date)
+        print(expenses)
 
         return JsonResponse(data={
             'trip_id': day.trip_id,
@@ -157,7 +162,17 @@ class DayItineraryView(View, APIMixinView):
             'notes': day.notes,
             'activities': [ActivityView.map_activity(a) for a in activities],
             'accommodation': [AccommodationView.map_accommodation(a) for a in accommodation],
-            # TODO - costs!
+            'costs': [
+                {
+                    'name': e.name,
+                    'date': e.date,
+                    'type': e.cost_type,
+                    'notes': e.notes,
+                    'cost': e.cost,
+                    'currency': e.currency,
+                    'activityId': e.activity_id,
+                } for e in expenses
+            ],
         })
 
     def _edit_day_itinerary(self, request: HttpRequest, trip_id, day, name, notes):
