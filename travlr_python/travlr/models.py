@@ -78,6 +78,17 @@ class Accommodation(models.Model):
     checkout_date = models.DateField()
     checkout_time = models.TimeField(null=True, blank=True)
 
+    def avg_cost_per_day(self):
+        if self.checkin_date and self.checkout_date and self.cost:
+            return round(self.cost / self.num_booked_days(), 2)
+        return None
+
+    def num_booked_days(self):
+        if self.checkin_date and self.checkout_date:
+            delta = self.checkout_date - self.checkin_date
+            return delta.days
+        return None
+
 
 # Adhoc costs during the trip
 class DayCost(models.Model):

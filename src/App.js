@@ -31,7 +31,6 @@ const appCtx = {
 function App() {
 
   // State to store the fetched data
-  const [data, setData] = useState(null);
   const [trip, setTrip] = useState(null);
   const [dayItinerary, setDayItinerary] = useState(null);
   // State to track loading state
@@ -76,9 +75,8 @@ function App() {
         // Set the fetched data in state
         // TODO - Does making multiple setFoo impact React re-render.
         setTrip(tripData);
-        setData(itinerary);
         setDayItinerary(dayItineraryData);
-        console.log(dayItinerary);
+        console.log(selectedDate, dayItinerary);
         // Set loading state to false
         setLoading(false); // TODO - remove and use the above variables to infer loading state.
 
@@ -110,7 +108,7 @@ function App() {
         <div className="mx-auto px-4 h-screen">
           <div className="bg-white shadow-md p-4 rounded">
             {loading ?  <p className='pt:5'>Loading itinerary!</p> : null}
-            {data && (<MainSection dayItinerary={dayItinerary} itinerary={data} selectedDate={selectedDate} setSelectedDate={setSelectedDate}/>)}
+            {dayItinerary && (<MainSection dayItinerary={dayItinerary} itinerary={dayItinerary} selectedDate={selectedDate} setSelectedDate={setSelectedDate}/>)}
           </div>
         </div>
       </div>

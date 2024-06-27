@@ -23,6 +23,7 @@ def exception_handling_view(func):
             return JsonResponse(data={
                 'error': str(e),
             }, status=500)
+
     return inner
 
 
@@ -72,7 +73,7 @@ class EditTripView(View, APIMixinView):
 
 
 class GetTripView(View, APIMixinView):
-    #@exception_handling_view
+    # @exception_handling_view
     def get(self, request: HttpRequest, trip_id, *args, **kwargs):
         trip = get_trip(trip_id)
         return JsonResponse(data={
@@ -138,7 +139,7 @@ class DayItineraryView(View, APIMixinView):
                     'name': day.name,
                     'date': day.date,
                     'notes': day.notes,
-                    'costs': [],
+                    'expenses': [],
                     # TODO - costs
                 } for day in days
             ]}, status=status.HTTP_200_OK)
@@ -151,7 +152,17 @@ class DayItineraryView(View, APIMixinView):
         # print(day_date, day.date)
         activities = Activity.objects.filter(trip_id__exact=trip_id, date__exact=day_date).all()
         # print(activities.query)
+
+        # Only handle first accommodation
         accommodation = get_accommodation(trip_id=trip_id, date=day_date)
+        if len(accommodation) > 1:
+            raise ValidationError("Too many accommodations!")
+        elif len(accommodation) == 1:
+            accommodation = accommodation[0]
+        else:
+            accommodation = None
+
+
         expenses = get_expenses_for_date(trip_id, day_date)
         print(expenses)
 
@@ -161,9 +172,16 @@ class DayItineraryView(View, APIMixinView):
             'date': day.date,
             'notes': day.notes,
             'activities': [ActivityView.map_activity(a) for a in activities],
-            'accommodation': [AccommodationView.map_accommodation(a) for a in accommodation],
-            'costs': [
-                {
+            'accommodation': AccommodationView.map_accommodation(accommodation),
+            'expenses': {
+                'total_expense': sum({e.cost for e in expenses}) + (accommodation.avg_cost_per_day() or 0),  # TODO - add accom cost
+                'accommodation_expense': {  # TODO
+                    'total_expense': accommodation.cost,
+                    'number_of_nights': accommodation.num_booked_days(),
+                    'expense_per_night': accommodation.avg_cost_per_day(),
+                } if accommodation else None,
+                'other_expenses': [{
+                    'id': e.id,
                     'name': e.name,
                     'date': e.date,
                     'type': e.cost_type,
@@ -171,8 +189,9 @@ class DayItineraryView(View, APIMixinView):
                     'cost': e.cost,
                     'currency': e.currency,
                     'activityId': e.activity_id,
-                } for e in expenses
-            ],
+                } for e in expenses]
+
+            }
         })
 
     def _edit_day_itinerary(self, request: HttpRequest, trip_id, day, name, notes):

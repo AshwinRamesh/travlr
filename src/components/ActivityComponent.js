@@ -1,7 +1,6 @@
 import React, {useState} from "react";
 
-export const ActivityComponent = (props) => {
-  const [activity, setActivity] = useState(props.activity);
+export const ActivityComponent = ({activity}) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
 
@@ -11,8 +10,10 @@ export const ActivityComponent = (props) => {
 
   return (
     <div className="bg-white rounded-lg shadow-lg flex mb-2">
-      <div className={`w-1/4 flex items-center justify-center ${activity.mapType().color}`}>
-        <p className='text-md text-white text-center'>{activity.mapType().emoji}</p>
+      {/*TODO - ${activity.mapType().color}*/}
+      <div className={`w-1/4 flex items-center justify-center`}>
+        {/*TODO - {activity.mapType().emoji}  */}
+        <p className='text-md text-white text-center'>😅</p>
       </div>
 
       <div class="w-3/4 p-2">
@@ -33,8 +34,9 @@ export const ActivityComponent = (props) => {
         <div
           className={`text-sm text-left overflow-hidden transition-max-height duration-300 ${isCollapsed ? 'max-h-screen' : 'max-h-0'}`}>
           <div className="px-4 py-2">
-            <p class="text-gray-700">Address - {activity.address}</p>
-            <p class="text-gray-700">Notes - {activity.details}</p>
+            <p className="text-gray-700">Activity ID - {activity.id}</p>
+            <p className="text-gray-700">Address - {activity.address}</p>
+            <p className="text-gray-700">Notes - {activity.details}</p>
           </div>
         </div>
 
