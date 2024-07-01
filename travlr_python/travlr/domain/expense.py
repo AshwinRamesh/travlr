@@ -14,7 +14,7 @@ def create_or_update_expense(trip_id, name, date, cost_type, cost, currency, not
     day_cost.name = validate_param(forms.CharField(), 'name', name)
     day_cost.date = validate_param(forms.DateField(), 'date', date)
     day_cost.cost_type = validate_param(forms.CharField(), 'cost_type', cost_type)
-    day_cost.cost = validate_param(forms.DecimalField(required=False), 'cost', cost)
+    day_cost.cost = validate_param(forms.DecimalField(required=False), 'cost', cost) # TODO - why is this not required?
     day_cost.currency = validate_param(forms.CharField(required=False), 'currency', currency)
     day_cost.notes = validate_param(forms.CharField(required=False), 'notes', notes)
     day_cost.activity_id = validate_param(forms.IntegerField(required=False), 'activity_id', activity_id)

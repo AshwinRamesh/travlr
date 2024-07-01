@@ -1,33 +1,19 @@
+import json
+
 from django import forms
 from django.core.exceptions import ValidationError
 from django.http import JsonResponse, HttpRequest
 from django.views import View
 from rest_framework import status
+from django.conf import settings
 
+from .api_response_mappers import map_expenses, map_expense
 from .domain.accomodation import get_accommodation, create_or_update_accommodation
 from .domain.activity import get_activities_by_date, create_or_update_activity
-from .domain.expense import get_expenses_for_date
+from .domain.expense import get_expenses_for_date, create_or_update_expense
 from .domain.trip import update_trip, get_trip, create_trip
 from .models import DayItinerary, Trip, Activity, CONFIRMATION_STATUS_VALS, Accommodation
 
-
-def exception_handling_view(func):
-    def inner(*args, **kwargs):
-        try:
-            return func(*args, **kwargs)
-        except ValidationError as e:
-            return JsonResponse(data={
-                'error': str(e),
-            }, status=400)
-        except Exception as e:  # TODO - throw exception if in debug mode?
-            return JsonResponse(data={
-                'error': str(e),
-            }, status=500)
-
-    return inner
-
-
-# Mixins
 
 class APIMixinView():
     NO_UPDATE_RESPONSE = JsonResponse(data={
@@ -41,25 +27,32 @@ class APIMixinView():
             e.message = "{} - {}".format(field_name, e.message)
             raise e
 
-    # TODO - this has a bug where error messages are getting wrapped in list formatting. Not a big deal yet.
-    def exception_handling_method(self, method, *args, **kwargs):
-        try:
-            return method(*args, **kwargs)
-        except ValidationError as e:
-            return JsonResponse(data={
-                'error': str(e),
-            }, status=400)
-        except Exception as e:  # TODO - throw exception if in debug mode?
-            return JsonResponse(data={
-                'error': str(e),
-            }, status=500)
+    @staticmethod
+    def exception_handling_view(func):
+        def inner(*args, **kwargs):
+            print(settings.DEBUG)
+            try:
+                return func(*args, **kwargs)
+            except ValidationError as e:
+                return JsonResponse(data={
+                    'error': str(e),
+                }, status=400)
+            except Exception as e:  # TODO - throw exception if in debug mode?
+                print('debug', settings.DEBUG)
+                if settings.DEBUG:
+                    raise e
+                return JsonResponse(data={
+                    'error': str(e),
+                }, status=500)
+
+        return inner
 
 
 # Basic views here
 
 class EditTripView(View, APIMixinView):
     # TODO - UpdateTripDatesAPI
-    @exception_handling_view
+    @APIMixinView.exception_handling_view
     def post(self, request: HttpRequest, *args, **kwargs):
         trip_id = request.POST.get('trip_id')
         name = request.POST.get('name')
@@ -85,7 +78,7 @@ class GetTripView(View, APIMixinView):
 
 
 class CreateTripView(View, APIMixinView):
-    @exception_handling_view
+    @APIMixinView.exception_handling_view
     # Create Trip
     def post(self, request: HttpRequest, *args, **kwargs):
         params = request.POST
@@ -108,20 +101,21 @@ class DayItineraryView(View, APIMixinView):
     # trip_id - PK for Trip
     # day - string formatted day YYYY-MM-DD
 
-    @exception_handling_view
+    @APIMixinView.exception_handling_view
     def get(self, request: HttpRequest, *args, **kwargs):
         trip_id = kwargs.get('trip_id')
         day = kwargs.get('day')
 
-        return self.exception_handling_method(self._get_day_itinerary, request, trip_id, day)
+        return self._get_day_itinerary(request, trip_id, day)
 
+    @APIMixinView.exception_handling_view
     def post(self, request: HttpRequest, trip_id, day, *args, **kwargs):
         trip_id = request.POST.get('trip_id')
         day = request.POST.get('day')
         notes = request.POST.get('notes')
         name = request.POST.get('name')
 
-        return self.exception_handling_method(self._edit_day_itinerary, request, trip_id, day, name, notes)
+        return self._edit_day_itinerary(request, trip_id, day, name, notes)
 
     # TODO - need to refactor this to reduce duplication across conditionals.
     def _get_day_itinerary(self, request: HttpRequest, trip_id, day):
@@ -162,7 +156,6 @@ class DayItineraryView(View, APIMixinView):
         else:
             accommodation = None
 
-
         expenses = get_expenses_for_date(trip_id, day_date)
         print(expenses)
 
@@ -172,24 +165,16 @@ class DayItineraryView(View, APIMixinView):
             'date': day.date,
             'notes': day.notes,
             'activities': [ActivityView.map_activity(a) for a in activities],
-            'accommodation': AccommodationView.map_accommodation(accommodation),
+            'accommodation': AccommodationView.map_accommodation(accommodation) if accommodation else None,
             'expenses': {
-                'total_expense': sum({e.cost for e in expenses}) + (accommodation.avg_cost_per_day() or 0),  # TODO - add accom cost
+                'total_expense': sum({e.cost for e in expenses}) + (
+                    accommodation.avg_cost_per_day() if accommodation else 0),  # TODO - add accom cost
                 'accommodation_expense': {  # TODO
                     'total_expense': accommodation.cost,
                     'number_of_nights': accommodation.num_booked_days(),
                     'expense_per_night': accommodation.avg_cost_per_day(),
                 } if accommodation else None,
-                'other_expenses': [{
-                    'id': e.id,
-                    'name': e.name,
-                    'date': e.date,
-                    'type': e.cost_type,
-                    'notes': e.notes,
-                    'cost': e.cost,
-                    'currency': e.currency,
-                    'activityId': e.activity_id,
-                } for e in expenses]
+                'other_expenses': map_expenses(expenses)
 
             }
         })
@@ -237,7 +222,7 @@ class ActivityView(View, APIMixinView):
             'trip': activity.trip_id,
         }
 
-    @exception_handling_view
+    @APIMixinView.exception_handling_view
     def get(self, request: HttpRequest, *args, **kwargs):
         trip_id = kwargs.get('trip_id')
         day = kwargs.get('day')
@@ -245,6 +230,7 @@ class ActivityView(View, APIMixinView):
         return JsonResponse(data={'activities': [self.map_activity(activity) for activity in activities]},
                             status=status.HTTP_200_OK)
 
+    @APIMixinView.exception_handling_view
     def post(self, request: HttpRequest, *args, **kwargs):
         trip_id = request.POST.get('trip_id')
         activity_id = request.POST.get('activity_id')
@@ -261,7 +247,7 @@ class ActivityView(View, APIMixinView):
         # Create activity
         activity = None
         if not activity_id:
-            return self.exception_handling_method(self._create_activity, request, activity_id)
+            return self._create_activity(request, activity_id)
 
         # Edit activity
         else:
@@ -271,7 +257,7 @@ class ActivityView(View, APIMixinView):
         return JsonResponse(data=self.map_activity(activity), status=status.HTTP_200_OK)
 
     # TODO - need end time of activity?
-    @exception_handling_view
+    @APIMixinView.exception_handling_view
     def _create_activity(self, request: HttpRequest, trip_id, name, country, city, address, status, notes, date, time):
         # Validation
         trip_id = self.validate_param(forms.IntegerField(), 'trip_id', trip_id)
@@ -309,7 +295,7 @@ class ActivityView(View, APIMixinView):
         return JsonResponse(data=self.map_activity(activity), status=status.HTTP_201_CREATED)
 
     # Must send all fields - always get overridden.
-    @exception_handling_view
+    @APIMixinView.exception_handling_view
     def _edit_activity(self, request: HttpRequest, trip_id, activity_id, name, country, city, address, status, notes,
                        date, time):
         # Validation
@@ -389,7 +375,28 @@ class AccommodationView(View, APIMixinView):
                                                        checkout_time, accommodation_id)
         return JsonResponse(data=self.map_accommodation(accommodation), status=status.HTTP_201_CREATED)
 
+
 # TODO - DayCostAPI - CRUD
+class DayCostView(View, APIMixinView):
+
+    @APIMixinView.exception_handling_view
+    def post(self, request: HttpRequest, *args, **kwargs):
+        data = json.loads(request.body.decode("utf-8"))
+        trip_id = data.get('trip_id')
+        date = data.get('date')
+        name = data.get('name')
+        cost = data.get('cost')
+        cost_type = "O"  # TODO - stop hardcoding!
+        currency = 'AUD'  # TODO - stop hardcoding!
+        notes = None  # TODO
+        print(data, "MEOW")
+        expense = create_or_update_expense(trip_id=trip_id, name=name, cost=cost, cost_type=cost_type, date=date,
+                                           currency=currency, notes=notes)
+
+        return JsonResponse(
+            data=map_expense(expense),
+            status=status.HTTP_200_OK
+        )
 
 # TODO - CostsDashboardAPI
 # - Current total spend

@@ -1,22 +1,3 @@
-function formatDateToHumanReadable(dateString) {
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  
-    const [month, day, year] = dateString.split('-');
-    const monthName = months[parseInt(month, 10) - 1];
-  
-    let daySuffix;
-    if (day === '1' || day === '21' || day === '31') {
-      daySuffix = 'st';
-    } else if (day === '2' || day === '22') {
-      daySuffix = 'nd';
-    } else if (day === '3' || day === '23') {
-      daySuffix = 'rd';
-    } else {
-      daySuffix = 'th';
-    }
-  
-    return `${monthName} ${parseInt(day, 10)}${daySuffix}, ${year}`;
-}
 
 function formatDate(date, asIso= false) {
     // Get month, day, and year from the Date object
@@ -66,5 +47,42 @@ function formatDateForId(date) {
   const formattedDate = "date-" + year + "-" + month + "-" + day;
   return formattedDate;
 }
+
+function formatDateToHumanReadable(date) {
+  // Define arrays for days of the week and months
+  const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const months = [
+    'January', 'February', 'March', 'April', 'May', 'June', 'July',
+    'August', 'September', 'October', 'November', 'December'
+  ];
+
+  // Get the day of the week, day of the month, month, and year
+  const dayOfWeek = daysOfWeek[date.getDay()];
+  const day = date.getDate();
+  const month = months[date.getMonth()];
+  const year = date.getFullYear();
+
+  // Function to get the ordinal suffix for the day
+  const getOrdinalSuffix = (day) => {
+    if (day > 3 && day < 21) return 'th'; // catch all 11th, 12th, 13th
+    switch (day % 10) {
+      case 1: return 'st';
+      case 2: return 'nd';
+      case 3: return 'rd';
+      default: return 'th';
+    }
+  };
+
+  // Construct the day with the ordinal suffix
+  const dayWithSuffix = day + getOrdinalSuffix(day);
+
+  // Construct the final formatted string
+  return `${dayOfWeek} - ${dayWithSuffix} ${month}, ${year}`;
+}
+
+// Example usage
+const date = new Date(2024, 6, 4); // Note: Months are 0-indexed (0 = January, 6 = July)
+console.log(formatDate(date)); // Output: "Thursday - 4th of July, 2024"
+
 
 export {formatDateToHumanReadable, formatDate, enumerateDates, formatDateForId, formatStringToDate};

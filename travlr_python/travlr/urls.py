@@ -14,5 +14,9 @@ urlpatterns = [
     path('trip/<int:trip_id>/day/', csrf_exempt(views.DayItineraryView.as_view()), name='day-get-all'),
     path('trip/day/update/', csrf_exempt(views.DayItineraryView.as_view()), name='day-update'),
 
+    # Cost/Expense APIs
+    path('trip/expense/create',
+         csrf_exempt(views.DayCostView.as_view(http_method_names=['post'])), name='expense-create'),
+
 
 ]
