@@ -6,23 +6,21 @@ import {Typography} from "@mui/material";
 import {DatePicker} from "@mui/x-date-pickers";
 import {travlrApiClient} from "../clients/TravlrApiClient.js";
 
-function ExpenseForm({selectedDate, refreshFn, onCancelFn, tripId}) {
+function ExpenseForm({tripId, selectedDate, refreshFn, onCancelFn,}) {
   const [cost, setCost] = useState('');
   const [activityName, setActivityName] = useState('');
   const [date, setDate] = useState(selectedDate);
 
-  // TODO - need to make this work.
+  // TODO - Needs better validation and exception handling probably. TODO - test bad input?
   const handleSubmit = (event) => {
     event.preventDefault();
     const formattedDate = date.format("YYYY-MM-DD");
     travlrApiClient.createExpense(tripId, formattedDate, activityName, cost)
       .then((r) => {
-        console.log(r)
         refreshFn();
       });
   };
 
-  console.log({cost, activityName, selectedDate, date});
   return (
     <Box component="form" onSubmit={handleSubmit} display="flex" flexDirection="column" gap={2} p={3} width={300}
          mx="auto">
