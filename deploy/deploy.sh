@@ -20,7 +20,7 @@ npm run build;
 rsync -avz --exclude 'node_modules' --exclude '*/node_modules' --exclude 'venv' --exclude '*/venv' --exclude '.git' --exclude '.git/*' $PATH_TO_PROJECT $SERVER_USER@$SERVER_IP:/root
 
 # Copy FE code
-rsync -avz --exclude 'node_modules' --exclude '*/node_modules' --exclude 'venv' --exclude '*/venv' --exclude '.git' --exclude '.git/*' $PAApTH_TO_PROJECT/travlr_js/dist $SERVER_USER@$SERVER_IP:/var/www/
+rsync -avz --exclude 'node_modules' --exclude '*/node_modules' --exclude 'venv' --exclude '*/venv' --exclude '.git' --exclude '.git/*' $PATH_TO_PROJECT/travlr_js/dist $SERVER_USER@$SERVER_IP:/var/www/
 
 
 ssh "${SERVER_USER}@${SERVER_IP}" << EOF

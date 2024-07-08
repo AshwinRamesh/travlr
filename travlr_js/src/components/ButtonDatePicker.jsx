@@ -53,7 +53,6 @@ function ButtonDatePicker(props) {
 }
 
 export default function PickerWithButtonField({label, selectedDate, setSelectedDate, onOpenSideEffect}) {
-  const [value, setValue] = React.useState(null);
   return (
     <ButtonDatePicker
       label={label}
