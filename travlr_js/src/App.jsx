@@ -23,6 +23,8 @@ import {formatDate, formatDateToHumanReadable} from "./helpers/dateHelpers.js";
 import dayjs from "dayjs";
 import {DatePicker} from "@mui/x-date-pickers";
 import PickerWithButtonField from "./components/ButtonDatePicker.jsx";
+import {AccommodationForm} from "./components/AccommodationForm.jsx";
+import {ActivityForm} from "./components/ActivityForm.jsx";
 
 function App() {
 
@@ -71,7 +73,7 @@ function App() {
       });
 
 
-  }, [selectedDate, seed, ]);
+  }, [selectedDate, seed,]);
 
   return (trip &&
     <>
@@ -86,7 +88,8 @@ function App() {
                 <Typography variant="h6" sx={{fontWeight: 'bold'}}>{selectedDate.format('ddd, DD MMMM')}</Typography>
                 {/*TODO - need to only do this if the values are available.*/}
                 {dayItinerary.accommodation &&
-                  <Typography variant="h6" sx={{fontWeight: 'bold'}}>{dayItinerary.accommodation.city}, {dayItinerary.accommodation.country}</Typography>
+                  <Typography variant="h6"
+                              sx={{fontWeight: 'bold'}}>{dayItinerary.accommodation.city}, {dayItinerary.accommodation.country}</Typography>
                 }
               </Box>
               <Button onClick={incrementDate}><ArrowForwardIosIcon/></Button>
@@ -98,8 +101,16 @@ function App() {
                 variant="contained"><AttachMoneyOutlinedIcon
                 onClick={(e) => setScreen(SCREEN_ADD_EXPENSE)}
               /></Button>
-              <Button variant="contained"><HikingIcon/></Button>
-              <Button variant="contained"><BedroomChildOutlined/></Button>
+              <Button
+                variant="contained"
+                onClick={(e) => setScreen(SCREEN_ADD_ACTIVITY)}>
+                <HikingIcon/>
+              </Button>
+              <Button
+                variant="contained"
+                onClick={(e) => setScreen(SCREEN_ADD_ACCOMMODATION)}>
+                <BedroomChildOutlined/>
+              </Button>
               <PickerWithButtonField
                 label={<CalendarMonthIcon/>}
                 selectedDate={dayjs(selectedDate)}
@@ -119,13 +130,26 @@ function App() {
               </Box>
             )}
 
+            {/*Expense Form View*/}
             {screen === SCREEN_ADD_EXPENSE && (
               <ExpenseForm
                 tripId={trip.id}
                 expenseTypes={trip.expense_types}
                 selectedDate={dayjs(selectedDate)}
                 refreshFn={refreshPageAndGoBackToItineraryView}
-                onCancelFn={() => {setScreen(SCREEN_ITINERARY);}}/>
+                onCancelFn={() => {
+                  setScreen(SCREEN_ITINERARY);
+                }}/>
+            )}
+
+            {/*Accommodation Form View*/}
+            {screen === SCREEN_ADD_ACCOMMODATION && (
+              <AccommodationForm/>
+            )}
+
+            {/*Activity Form View*/}
+            {screen === SCREEN_ADD_ACTIVITY && (
+              <ActivityForm/>
             )}
 
 
