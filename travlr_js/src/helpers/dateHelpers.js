@@ -1,41 +1,50 @@
+import dayjs from "dayjs";
 
-function formatDate(date, asIso= false) {
-    // Get month, day, and year from the Date object
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // Month is zero-indexed
-    const day = String(date.getDate()).padStart(2, '0');
-    const year = date.getFullYear();
+function formatDate(date, asIso = false) {
 
-    // Return "YYYY-MM-DD"
+  if (dayjs.isDayjs(date)) {
     if (asIso) {
-      return `${year}-${month}-${day}`;
+      return date.format("YYYY-MM-DD");
     }
-    // Return "MM-DD-YYYY"
-    return `${month}-${day}-${year}`;
+    return date.format("MM-DD-YYYY");
+  }
+
+  // Get month, day, and year from the Date object
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // Month is zero-indexed
+  const day = String(date.getDate()).padStart(2, '0');
+  const year = date.getFullYear();
+
+  // Return "YYYY-MM-DD"
+  if (asIso) {
+    return `${year}-${month}-${day}`;
+  }
+  // Return "MM-DD-YYYY"
+  return `${month}-${day}-${year}`;
 }
 
 function enumerateDates(startDateStr, endDateStr, includeEndDate = false) {
-    const startDate = new Date(startDateStr);
-    const endDate = new Date(endDateStr);
-    const dates = [];
-    
-    // Iterate through dates starting from startDate to endDate
-    for (let date = new Date(startDate); date <= endDate; date.setDate(date.getDate() + 1)) {
-      // Push the formatted date string to the dates array
-      const d = new Date(date);
-      dates.push(formatDate(d));
-    }
-    
-    if (includeEndDate) {
-        return dates;
-    } else {
-        return dates.slice(0, -1);
-    }
+  const startDate = new Date(startDateStr);
+  const endDate = new Date(endDateStr);
+  const dates = [];
+
+  // Iterate through dates starting from startDate to endDate
+  for (let date = new Date(startDate); date <= endDate; date.setDate(date.getDate() + 1)) {
+    // Push the formatted date string to the dates array
+    const d = new Date(date);
+    dates.push(formatDate(d));
+  }
+
+  if (includeEndDate) {
+    return dates;
+  } else {
+    return dates.slice(0, -1);
+  }
 }
 
 // Convert MM-DD-YYYY string into a Date obj
 function formatStringToDate(strDate) {
-    const [month, day, year] = strDate.split("-");
-    return new Date(year, month - 1, day);
+  const [month, day, year] = strDate.split("-");
+  return new Date(year, month - 1, day);
 }
 
 // date is a Date() obj
@@ -66,10 +75,14 @@ function formatDateToHumanReadable(date) {
   const getOrdinalSuffix = (day) => {
     if (day > 3 && day < 21) return 'th'; // catch all 11th, 12th, 13th
     switch (day % 10) {
-      case 1: return 'st';
-      case 2: return 'nd';
-      case 3: return 'rd';
-      default: return 'th';
+      case 1:
+        return 'st';
+      case 2:
+        return 'nd';
+      case 3:
+        return 'rd';
+      default:
+        return 'th';
     }
   };
 

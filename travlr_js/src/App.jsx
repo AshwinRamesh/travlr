@@ -21,6 +21,8 @@ import ExpenseForm from "./components/ExpenseForm.jsx";
 import {travlrApiClient} from "./clients/TravlrApiClient.js";
 import {formatDate, formatDateToHumanReadable} from "./helpers/dateHelpers.js";
 import dayjs from "dayjs";
+import {DatePicker} from "@mui/x-date-pickers";
+import PickerWithButtonField from "./components/ButtonDatePicker.jsx";
 
 function App() {
 
@@ -33,22 +35,18 @@ function App() {
   // TODO -  Refresh seed... bit hacky!
   const [seed, setSeed] = useState(1);
   const [screen, setScreen] = useState(null);
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(dayjs());
   const [trip, setTrip] = useState(null);
   const [dayItinerary, setDayItinerary] = useState(null);
 
   const incrementDate = () => {
-    const newDate = selectedDate.getDate() + 1;
-    selectedDate.setDate(newDate);
-    const d = new Date(selectedDate);
-    setSelectedDate(d);
+    const newDate = selectedDate.add(1, 'day');
+    setSelectedDate(newDate);
   }
 
   const decrementDate = () => {
-    const newDate = selectedDate.getDate() - 1;
-    selectedDate.setDate(newDate);
-    const d = new Date(selectedDate);
-    setSelectedDate(d);
+    const newDate = selectedDate.add(-1, 'day');
+    setSelectedDate(newDate);
   }
 
   const refreshPageAndGoBackToItineraryView = () => {
@@ -85,7 +83,7 @@ function App() {
             <Box display="flex" justifyContent="space-between" alignItems="center" px={5} py={2}>
               <Button><ArrowBackIosIcon onClick={decrementDate}/></Button>
               <Box textAlign="center">
-                <Typography variant="h6" sx={{fontWeight: 'bold'}}>{formatDateToHumanReadable(selectedDate)}</Typography>
+                <Typography variant="h6" sx={{fontWeight: 'bold'}}>{selectedDate.format('ddd, DD MMMM')}</Typography>
                 {/*TODO - need to only do this if the values are available.*/}
                 {dayItinerary.accommodation &&
                   <Typography variant="h6" sx={{fontWeight: 'bold'}}>{dayItinerary.accommodation.city}, {dayItinerary.accommodation.country}</Typography>
@@ -93,6 +91,8 @@ function App() {
               </Box>
               <Button onClick={incrementDate}><ArrowForwardIosIcon/></Button>
             </Box>
+
+            {/*Buttons section*/}
             <Box display={'flex'} justifyContent={'center'} gap={'5px'} mb={2}>
               <Button
                 variant="contained"><AttachMoneyOutlinedIcon
@@ -100,14 +100,16 @@ function App() {
               /></Button>
               <Button variant="contained"><HikingIcon/></Button>
               <Button variant="contained"><BedroomChildOutlined/></Button>
-              <Button
-                variant="contained"
-                onClick={(e) => setScreen(SCREEN_ITINERARY)}
-              >
-                <CalendarMonthIcon/>
-              </Button>
+              <PickerWithButtonField
+                label={<CalendarMonthIcon/>}
+                selectedDate={dayjs(selectedDate)}
+                setSelectedDate={setSelectedDate}
+                onOpenSideEffect={(e) => setScreen(SCREEN_ITINERARY)}
+              />
             </Box>
+
             <Divider/>
+
             {/*Show Itinerary View*/}
             {screen === SCREEN_ITINERARY && (
               <Box p={2}>
@@ -136,6 +138,4 @@ function App() {
   )
 }
 
-
-console.log(import.meta.env.MODE);
 export default App

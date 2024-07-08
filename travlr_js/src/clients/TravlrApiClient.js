@@ -22,7 +22,6 @@ class TravlrApi {
   }
 
   getTripItineraryForDate(id, date) {
-    console.log(id, date);
     return fetch(this.baseUrl + "/api/trip/" + id + "/day/" + date)
       .then(response => {
         if (!response.ok) {
@@ -38,7 +37,6 @@ class TravlrApi {
   }
 
   createExpense(tripId, date, name, cost, expenseType, notes) {
-    console.log("Create Expense Data:", tripId, date, name, cost);
     return fetch(this.baseUrl + "/api/trip/expense/create", {
       method: "POST",
       body: JSON.stringify({
