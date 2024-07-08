@@ -90,6 +90,7 @@ class Accommodation(models.Model):
         return None
 
 
+# TODO - soft delete?
 # Adhoc costs during the trip
 class DayCost(models.Model):
 

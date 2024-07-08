@@ -77,7 +77,7 @@ function App() {
 
   return (trip &&
     <>
-      <Container maxWidth={"md"} sx={{height: 5000}}>
+      <Container maxWidth={"md"}>
         <NavBar/>
         <Box maxWidth={'lg'}>
           <Typography variant={'h4'} textAlign={'center'} py={2}>{trip.name}</Typography>
@@ -113,12 +113,17 @@ function App() {
               <Box p={2}>
                 <AccommodationAccordian accommodation={dayItinerary.accommodation}/>
                 <ActivityAccordian activities={dayItinerary.activities}/>
-                <ExpenseAccordian expenses={dayItinerary.expenses}/>
+                <ExpenseAccordian expenseTypes={trip.expense_types} expenses={dayItinerary.expenses}/>
               </Box>
             )}
 
             {screen === SCREEN_ADD_EXPENSE && (
-              <ExpenseForm tripId={trip.id} selectedDate={dayjs(selectedDate)} refreshFn={refreshPageAndGoBackToItineraryView} onCancelFn={() => {setScreen(SCREEN_ITINERARY);}}/>
+              <ExpenseForm
+                tripId={trip.id}
+                expenseTypes={trip.expense_types}
+                selectedDate={dayjs(selectedDate)}
+                refreshFn={refreshPageAndGoBackToItineraryView}
+                onCancelFn={() => {setScreen(SCREEN_ITINERARY);}}/>
             )}
 
 
@@ -131,4 +136,6 @@ function App() {
   )
 }
 
+
+console.log(import.meta.env.MODE);
 export default App

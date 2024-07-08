@@ -1,0 +1,14 @@
+server {
+    listen 8080;
+
+    location = /favicon.ico { access_log off; log_not_found off; }
+
+    location / {
+        alias /var/www/dist/;
+    }
+
+    location /api/ {
+        include proxy_params;
+        proxy_pass http://unix:/run/gunicorn.sock;
+    }
+}

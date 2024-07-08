@@ -37,7 +37,7 @@ class TravlrApi {
       });
   }
 
-  createExpense(tripId, date, name, cost) {
+  createExpense(tripId, date, name, cost, expenseType, notes) {
     console.log("Create Expense Data:", tripId, date, name, cost);
     return fetch(this.baseUrl + "/api/trip/expense/create", {
       method: "POST",
@@ -46,6 +46,8 @@ class TravlrApi {
         date: date,
         name: name,
         cost: cost,
+        notes: notes,
+        cost_type: expenseType
       })
     }).then(r => {
       if (!r.ok) {
@@ -61,5 +63,8 @@ class TravlrApi {
   }
 }
 
+// const baseUrl = "http://143.198.66.108:8080";
+// const baseUrl = "http://127.0.0.1:8000";
+const baseUrl = import.meta.env.VITE_TRAVLR_API_URL;
 
-export const travlrApiClient = new TravlrApi("http://127.0.0.1:8000");
+export const travlrApiClient = new TravlrApi(baseUrl);

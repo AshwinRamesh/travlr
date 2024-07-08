@@ -12,7 +12,7 @@ from .domain.accomodation import get_accommodation, create_or_update_accommodati
 from .domain.activity import get_activities_by_date, create_or_update_activity
 from .domain.expense import get_expenses_for_date, create_or_update_expense
 from .domain.trip import update_trip, get_trip, create_trip
-from .models import DayItinerary, Trip, Activity, CONFIRMATION_STATUS_VALS, Accommodation
+from .models import DayItinerary, Trip, Activity, CONFIRMATION_STATUS_VALS, Accommodation, DayCost
 
 
 class APIMixinView():
@@ -73,7 +73,9 @@ class GetTripView(View, APIMixinView):
             'id': trip.pk,
             'name': trip.name,
             'start_date': trip.start_date,
-            'end_date': trip.end_date
+            'end_date': trip.end_date,
+            'expense_types': DayCost.COST_TYPES,
+            'status_types': CONFIRMATION_STATUS_VALS
         }, status=status.HTTP_200_OK)
 
 
@@ -386,10 +388,10 @@ class DayCostView(View, APIMixinView):
         date = data.get('date')
         name = data.get('name')
         cost = data.get('cost')
-        cost_type = "O"  # TODO - stop hardcoding!
+        cost_type = data.get('cost_type')
         currency = 'AUD'  # TODO - stop hardcoding!
-        notes = None  # TODO
-        print(data, "MEOW")
+        notes = data.get('notes')
+
         expense = create_or_update_expense(trip_id=trip_id, name=name, cost=cost, cost_type=cost_type, date=date,
                                            currency=currency, notes=notes)
 
