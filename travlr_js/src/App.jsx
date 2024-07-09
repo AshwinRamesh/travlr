@@ -82,6 +82,9 @@ function App() {
         <Box maxWidth={'lg'}>
           <Typography variant={'h4'} textAlign={'center'} py={2}>{trip.name}</Typography>
           <Paper elevation={3}>
+
+
+            {/*Title & Date Section*/}
             <Box display="flex" justifyContent="space-between" alignItems="center" px={5} py={2}>
               <Button><ArrowBackIosIcon onClick={decrementDate}/></Button>
               <Box textAlign="center">
@@ -149,7 +152,11 @@ function App() {
 
             {/*Activity Form View*/}
             {screen === SCREEN_ADD_ACTIVITY && (
-              <ActivityForm/>
+              <ActivityForm
+                tripId={trip.id}
+                expenseTypes={trip.activity_types}
+                selectedDate={dayjs(selectedDate)}
+              />
             )}
 
 

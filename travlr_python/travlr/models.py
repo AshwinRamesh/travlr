@@ -42,6 +42,16 @@ class DayItinerary(models.Model):
 
 # TODO - need activity type
 class Activity(models.Model):
+
+    ACTIVITY_TYPES = {
+        'O': 'Other',
+        'R': 'Food/Resteraunt',
+        'B': 'Bar/Drinks',
+        'F': 'Flight',
+        'T': 'Train/Bus/Boat',
+        'S': 'Sightseeing',
+    }
+
     name = models.CharField(max_length=200) 
     country = models.CharField(max_length=200, null=True, blank=True)
     city = models.CharField(max_length=200, null=True, blank=True)

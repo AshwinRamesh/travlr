@@ -75,6 +75,7 @@ class GetTripView(View, APIMixinView):
             'start_date': trip.start_date,
             'end_date': trip.end_date,
             'expense_types': DayCost.COST_TYPES,
+            'activity_types': Activity.ACTIVITY_TYPES,
             'status_types': CONFIRMATION_STATUS_VALS
         }, status=status.HTTP_200_OK)
 
